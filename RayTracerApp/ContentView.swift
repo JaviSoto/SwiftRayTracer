@@ -15,7 +15,7 @@ private func gradient(width: Int, height: Int) -> RayTracer.Image {
         pixels:
             (0..<height).reversed().flatMap { y in
                 (0..<width).map { x in
-                    Vec3(
+                    Color3(
                         Double(x) / (Double(width - 1)),
                         Double(y) / (Double(height - 1)),
                         0.25
@@ -25,6 +25,41 @@ private func gradient(width: Int, height: Int) -> RayTracer.Image {
         , width: width)
 }
 
+private enum Scene {
+    static func rayColor(_ ray: Ray) -> Color3 {
+        let normalizedDirection = ray.direction
+        let t = 0.5 * (normalizedDirection.y + 1.0)
+        return .init(1.0 - t) * Color3(1) + .init(t) * Color3(0.5, 0.7, 1.0)
+    }
+
+    static func render(width: Int, height: Int) -> RayTracer.Image {
+        // Camera
+        let aspectRatio = Double(width) / Double(height)
+        let viewportHeight = 2.0
+        let viewportWidth = aspectRatio * viewportHeight
+        let focalLength = 1.0
+
+        let origin = Point3(0)
+        let horizontal = Vec3(viewportWidth, 0, 0)
+        let vertical = Vec3(0, viewportHeight, 0)
+        let lowerLeftCorner = origin - horizontal / 2 - vertical / 2 - Vec3(0, 0, focalLength)
+
+        // Render
+        return Image(
+            pixels:
+                (0..<height).reversed().flatMap { y in
+                    (0..<width).map { x in
+                        let u = Vec3(Double(x) / Double(width - 1))
+                        let v = Vec3(Double(y) / Double(height - 1))
+                        let ray = Ray(origin: origin, direction: lowerLeftCorner + u * horizontal + v * vertical - origin)
+
+                        return rayColor(ray)
+                    }
+                }
+            , width: width)
+    }
+}
+
 struct ContentView: View {
     var body: some View {
         EmptyView()
@@ -32,7 +67,7 @@ struct ContentView: View {
                 let width = Int(proxy.size.width)
                 let height = Int(proxy.size.height)
                 measure("\(width)x\(height) gradient") {
-                    gradient(width: width, height: height)
+                    Scene.render(width: width, height: height)
                         .render()
                 }
             })

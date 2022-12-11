@@ -7,6 +7,10 @@
 
 import Foundation
 
+/// Equivalent names for `Vec3` for better semantic meaning.
+public typealias Point3 = Vec3
+public typealias Color3 = Vec3
+
 public struct Vec3: Equatable {
     public let x: Double
     public let y: Double
