@@ -164,4 +164,12 @@ extension Vec3 {
     public var asColor: Color {
         return Color(red: x, green: y, blue: z)
     }
+
+    public var sRGBAValue: UInt32 {
+        let color = self * 255.0
+        return UInt32(color.red) << 24
+        + UInt32(color.green) << 16
+        + UInt32(color.blue) << 8
+        + 255
+    }
 }
