@@ -25,19 +25,26 @@ private func gradient(width: Int, height: Int) -> RayTracer.Image {
         , width: width)
 }
 
-private enum Scene {
-    static func rayColor(_ ray: Ray) -> Color3 {
+private struct Scene {
+    struct Parameters {
+        var viewportHeight: Double = 2
+        var focalLength: Double = 1
+    }
+
+    var parameters: Parameters = .init()
+
+    private func rayColor(_ ray: Ray) -> Color3 {
         let normalizedDirection = ray.direction
         let t = 0.5 * (normalizedDirection.y + 1.0)
         return .init(1.0 - t) * Color3(1) + .init(t) * Color3(0.5, 0.7, 1.0)
     }
 
-    static func render(width: Int, height: Int) -> RayTracer.Image {
+    func render(width: Int, height: Int) -> RayTracer.Image {
         // Camera
         let aspectRatio = Double(width) / Double(height)
-        let viewportHeight = 2.0
+        let viewportHeight = parameters.viewportHeight
         let viewportWidth = aspectRatio * viewportHeight
-        let focalLength = 1.0
+        let focalLength = parameters.focalLength
 
         let origin = Point3(0)
         let horizontal = Vec3(viewportWidth, 0, 0)
@@ -61,16 +68,41 @@ private enum Scene {
 }
 
 struct ContentView: View {
+    @State
+    private var scene: Scene = Scene()
+
+    private var configurationView: some View {
+        VStack {
+            Form {
+                VStack {
+                    Text("Viewport Height: \(scene.parameters.viewportHeight, specifier: "%.1f")")
+                        .lineLimit(1)
+                    Slider(value: $scene.parameters.viewportHeight, in: -5...5, step: 0.1)
+                }
+
+                VStack {
+                    Text("Focal Length: \(scene.parameters.focalLength, specifier: "%.1f")")
+                        .lineLimit(1)
+                    Slider(value: $scene.parameters.focalLength, in: -5...5, step: 0.1)
+                }
+            }
+        }
+    }
+
     var body: some View {
-        EmptyView()
-            .overlay(GeometryReader { proxy in
+        HStack {
+            GeometryReader { proxy in
                 let width = Int(proxy.size.width)
                 let height = Int(proxy.size.height)
                 measure("\(width)x\(height) gradient") {
-                    Scene.render(width: width, height: height)
+                    scene.render(width: width, height: height)
                         .render()
                 }
-            })
+            }
+
+            configurationView
+                .frame(width: 150)
+        }
     }
 }
 
