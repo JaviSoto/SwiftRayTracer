@@ -29,9 +29,21 @@ private struct Scene {
     struct Parameters {
         var viewportHeight: Double = 2
         var focalLength: Double = 1
+
+        var sphereRadius: Double = 0.5
+        var sphereCenter: Point3 = .init(x: 0, y: 0, z: -1)
     }
 
     var parameters: Parameters = .init()
+
+    private func hitSphere(_ ray: Ray) -> Bool {
+        let oc = ray.origin - parameters.sphereCenter
+        let a = ray.direction • ray.direction
+        let b = 2 * (oc • ray.direction)
+        let c = (oc • oc) - (parameters.sphereRadius * parameters.sphereRadius)
+        let discriminant = b * b - (4 * a * c);
+        return discriminant > 0
+    }
 
     private func rayColor(_ ray: Ray) -> Color3 {
         let normalizedDirection = ray.direction
@@ -72,19 +84,57 @@ struct ContentView: View {
     private var scene: Scene = Scene()
 
     private var configurationView: some View {
-        VStack {
-            Form {
+        Form {
+            HStack(alignment: .top) {
                 VStack {
-                    Text("Viewport Height: \(scene.parameters.viewportHeight, specifier: "%.1f")")
-                        .lineLimit(1)
-                    Slider(value: $scene.parameters.viewportHeight, in: -5...5, step: 0.1)
-                }
+                    Text("Parameters")
+                        .font(.largeTitle)
 
-                VStack {
-                    Text("Focal Length: \(scene.parameters.focalLength, specifier: "%.1f")")
-                        .lineLimit(1)
-                    Slider(value: $scene.parameters.focalLength, in: -5...5, step: 0.1)
+                    Divider()
+
+                    VStack {
+                        Text("Viewport Height: \(scene.parameters.viewportHeight, specifier: "%.1f")")
+                            .lineLimit(1)
+                        Slider(value: $scene.parameters.viewportHeight, in: -5...5, step: 0.1)
+                    }
+
+                    VStack {
+                        Text("Focal Length: \(scene.parameters.focalLength, specifier: "%.1f")")
+                            .lineLimit(1)
+                        Slider(value: $scene.parameters.focalLength, in: -5...5, step: 0.1)
+                    }
+
+                    Divider()
+
+                    Text("Sphere:")
+                        .fontWeight(.bold)
+
+                    VStack {
+                        Text("Radius: \(scene.parameters.sphereRadius, specifier: "%.1f")")
+                            .lineLimit(1)
+                        Slider(value: $scene.parameters.sphereRadius, in: -10...10, step: 0.1)
+                    }
+
+                    VStack {
+                        Text("Position: (\(scene.parameters.sphereCenter.x, specifier: "%.1f"), \(scene.parameters.sphereCenter.y, specifier: "%.1f"), \(scene.parameters.sphereCenter.z, specifier: "%.1f"))")
+                            .lineLimit(1)
+                        HStack {
+                            Text("x: ")
+                            Slider(value: $scene.parameters.sphereCenter.x, in: -10...10, step: 0.1)
+                        }
+                        HStack {
+                            Text("y: ")
+                            Slider(value: $scene.parameters.sphereCenter.y, in: -10...10, step: 0.1)
+                        }
+                        HStack {
+                            Text("z: ")
+                            Slider(value: $scene.parameters.sphereCenter.z, in: -10...10, step: 0.1)
+                        }
+                    }
+
+                    Spacer()
                 }
+                .font(.callout)
             }
         }
     }
@@ -101,7 +151,7 @@ struct ContentView: View {
             }
 
             configurationView
-                .frame(width: 150)
+                .frame(width: 200)
         }
     }
 }

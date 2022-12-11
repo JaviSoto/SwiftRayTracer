@@ -12,9 +12,9 @@ public typealias Point3 = Vec3
 public typealias Color3 = Vec3
 
 public struct Vec3: Equatable {
-    public let x: Double
-    public let y: Double
-    public let z: Double
+    public var x: Double
+    public var y: Double
+    public var z: Double
 
     public init() {
         self = 0
