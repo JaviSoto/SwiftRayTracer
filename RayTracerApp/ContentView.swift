@@ -36,16 +36,25 @@ private struct Scene {
 
     var parameters: Parameters = .init()
 
-    private func hitSphere(_ ray: Ray) -> Bool {
+    private func hitSphere(_ ray: Ray) -> Double? {
         let oc = ray.origin - parameters.sphereCenter
         let a = ray.direction • ray.direction
         let b = 2 * (oc • ray.direction)
         let c = (oc • oc) - (parameters.sphereRadius * parameters.sphereRadius)
         let discriminant = b * b - (4 * a * c);
-        return discriminant > 0
+        guard discriminant >= 0 else { return nil }
+
+        return (-b - discriminant.squareRoot()) / (2 * a)
     }
 
     private func rayColor(_ ray: Ray) -> Color3 {
+        if let sphereHit = hitSphere(ray) {
+            if sphereHit > 0 {
+                let n: Vec3 = (ray.point(at: sphereHit) - Vec3(0, 0, -1)).normalized()
+                return 0.5 * Color3(n.x + 1, n.y + 1, n.z + 1)
+            }
+        }
+
         let normalizedDirection = ray.direction
         let t = 0.5 * (normalizedDirection.y + 1.0)
         return .init(1.0 - t) * Color3(1) + .init(t) * Color3(0.5, 0.7, 1.0)
@@ -112,7 +121,7 @@ struct ContentView: View {
                     VStack {
                         Text("Radius: \(scene.parameters.sphereRadius, specifier: "%.1f")")
                             .lineLimit(1)
-                        Slider(value: $scene.parameters.sphereRadius, in: -10...10, step: 0.1)
+                        Slider(value: $scene.parameters.sphereRadius, in: 0...10, step: 0.1)
                     }
 
                     VStack {
