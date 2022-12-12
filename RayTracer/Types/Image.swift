@@ -18,7 +18,7 @@ public struct Image {
 
         self.pixels = pixels
         self.width = width
-        self.height = pixels.count / width
+        self.height = width > 0 ? pixels.count / width : 0
     }
 }
 
@@ -27,7 +27,7 @@ public struct Image {
 import SwiftUI
 
 extension Image {
-    public func render() -> SwiftUI.Image {
+    public func asSwiftUIImage() -> SwiftUI.Image {
         var pixels = pixels.map(\.sRGBAValue)
         let cgImage = pixels.withUnsafeMutableBytes { ptr -> CGImage in
             return CGContext(

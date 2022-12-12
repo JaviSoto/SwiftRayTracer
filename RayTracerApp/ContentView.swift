@@ -8,38 +8,16 @@
 import SwiftUI
 import RayTracer
 
-private func gradient(width: Int, height: Int) -> RayTracer.Image {
-    print("Creating \(width)x\(height) gradient")
-
-    return Image(
-        pixels:
-            (0..<height).reversed().flatMap { y in
-                (0..<width).map { x in
-                    Color3(
-                        Double(x) / (Double(width - 1)),
-                        Double(y) / (Double(height - 1)),
-                        0.25
-                    )
-                }
-            }
-        , width: width)
-}
-
 private struct Scene {
-    struct Parameters {
-        var viewportHeight: Double = 2
-        var focalLength: Double = 1
+    var camera: Camera = .init(viewportWidth: 2 * 16/9, viewportHeight: 2)
 
-        var world: World = .init(objects: [
-            Sphere(center: .init(x: 0, y: 0, z: -1), radius: 0.5),
-            Sphere(center: .init(x: 0, y: -100.5, z: -1), radius: 100),
-        ])
-    }
-
-    var parameters: Parameters = .init()
+    var world: World = .init(objects: [
+        Sphere(center: .init(x: 0, y: 0, z: -1), radius: 0.5),
+        Sphere(center: .init(x: 0, y: -100.5, z: -1), radius: 100),
+    ])
 
     private func rayColor(_ ray: Ray) -> Color3 {
-        if let worldHit = parameters.world.hitTest(with: ray, validTRange: 0.0...(.greatestFiniteMagnitude)) {
+        if let worldHit = world.hitTest(with: ray, validTRange: 0.0...(.greatestFiniteMagnitude)) {
             return 0.5 * (worldHit.normal + Color3(1))
         }
 
@@ -49,25 +27,17 @@ private struct Scene {
     }
 
     func render(width: Int, height: Int) -> RayTracer.Image {
-        // Camera
-        let aspectRatio = Double(width) / Double(height)
-        let viewportHeight = parameters.viewportHeight
-        let viewportWidth = aspectRatio * viewportHeight
-        let focalLength = parameters.focalLength
+        guard width > 0, height > 0 else {
+            return RayTracer.Image(pixels: [], width: 0)
+        }
 
-        let origin = Point3(0)
-        let horizontal = Vec3(viewportWidth, 0, 0)
-        let vertical = Vec3(0, viewportHeight, 0)
-        let lowerLeftCorner = origin - horizontal / 2 - vertical / 2 - Vec3(0, 0, focalLength)
-
-        // Render
         return Image(
             pixels:
                 (0..<height).reversed().flatMap { y in
                     (0..<width).map { x in
-                        let u = Vec3(Double(x) / Double(width - 1))
-                        let v = Vec3(Double(y) / Double(height - 1))
-                        let ray = Ray(origin: origin, direction: lowerLeftCorner + u * horizontal + v * vertical - origin)
+                        let normalizedX = Double(x) / Double(width - 1)
+                        let normalizedY = Double(y) / Double(height - 1)
+                        let ray = camera.ray(atNormalizedX: normalizedX, normalizedY: normalizedY)
 
                         return rayColor(ray)
                     }
@@ -78,31 +48,37 @@ private struct Scene {
 
 struct ContentView: View {
     @State
+    private var width: Int = 10
+
+    @State
+    private var height: Int = 10
+
+    @State
     private var scene: Scene = Scene()
 
     private var sphereConfigurationView: some View {
-        ForEach(Array(scene.parameters.world.spheres.enumerated()), id: \.0) { index, sphere in
+        ForEach(Array(scene.world.spheres.enumerated()), id: \.0) { index, sphere in
             VStack {
                 Text("Position: (\(sphere.center.x, specifier: "%.1f"), \(sphere.center.y, specifier: "%.1f"), \(sphere.center.z, specifier: "%.1f"))")
                     .lineLimit(1)
-                Slider(value: $scene.parameters.world.spheres[index].center.x, in: -100...100, step: 1) {
+                Slider(value: $scene.world.spheres[index].center.x, in: -100...100, step: 1) {
                     Text("x: \(sphere.center.x)")
                 }
-                Slider(value: $scene.parameters.world.spheres[index].center.y, in: -100...100, step: 1) {
+                Slider(value: $scene.world.spheres[index].center.y, in: -100...100, step: 1) {
                     Text("y: \(sphere.center.y)")
                 }
-                Slider(value: $scene.parameters.world.spheres[index].center.z, in: -100...100, step: 1) {
+                Slider(value: $scene.world.spheres[index].center.z, in: -100...100, step: 1) {
                     Text("z: \(sphere.center.z)")
                 }
                 VStack {
-                    Slider(value: $scene.parameters.world.spheres[index].radius, in: 0...100, step: 0.5) {
+                    Slider(value: $scene.world.spheres[index].radius, in: 0...100, step: 0.5) {
                         Text("Radius: \(sphere.radius, specifier: "%.1f")")
                             .lineLimit(1)
                     }
                 }
 
                 Button("Remove") {
-                    scene.parameters.world.spheres.remove(at: index)
+                    scene.world.spheres.remove(at: index)
                 }
 
                 Spacer()
@@ -121,13 +97,13 @@ struct ContentView: View {
                         .font(.largeTitle)
 
                     Section(header: Text("Viewport").fontWeight(.bold)) {
-                        Slider(value: $scene.parameters.viewportHeight, in: -5...5, step: 0.1) {
-                            Text("Height: \(scene.parameters.viewportHeight, specifier: "%.1f")")
+                        Slider(value: $scene.camera.viewportHeight, in: -5...5, step: 0.1) {
+                            Text("Height: \(scene.camera.viewportHeight, specifier: "%.1f")")
                                 .lineLimit(1)
                         }
 
-                        Slider(value: $scene.parameters.focalLength, in: -5...5, step: 0.1) {
-                            Text("Focal Length: \(scene.parameters.focalLength, specifier: "%.1f")")
+                        Slider(value: $scene.camera.focalLength, in: -5...5, step: 0.1) {
+                            Text("Focal Length: \(scene.camera.focalLength, specifier: "%.1f")")
                                 .lineLimit(1)
                         }
                     }
@@ -140,7 +116,7 @@ struct ContentView: View {
                         }
 
                         Button("New Sphere") {
-                            scene.parameters.world.objects.append(Sphere(center: .init(0, 0, -1), radius: 0.3))
+                            scene.world.objects.append(Sphere(center: .init(0, 0, -1), radius: 0.3))
                         }
                     }
 
@@ -153,13 +129,13 @@ struct ContentView: View {
 
     var body: some View {
         HStack {
-            GeometryReader { proxy in
-                let width = Int(proxy.size.width)
-                let height = Int(proxy.size.height)
-                measure("\(width)x\(height) gradient") {
-                    scene.render(width: width, height: height)
-                        .render()
-                }
+            measure("\(width)x\(height) scene") {
+                scene.render(width: width, height: height).asSwiftUIImage()
+            }
+            .onSizeChange { size in
+                width = Int(size.width)
+                height = Int(size.height)
+                scene.camera.viewportWidth = (size.width / size.height) * scene.camera.viewportHeight
             }
 
             ZStack {

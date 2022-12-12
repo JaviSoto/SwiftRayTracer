@@ -23,6 +23,8 @@
 		597F398B29466C6600CF2C99 /* Vec3.swift in Sources */ = {isa = PBXBuildFile; fileRef = 597F398A29466C6600CF2C99 /* Vec3.swift */; };
 		597F398D29466C9500CF2C99 /* Vec3Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 597F398C29466C9500CF2C99 /* Vec3Tests.swift */; };
 		59BC0FEB2946AA000091D064 /* World.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59BC0FEA2946AA000091D064 /* World.swift */; };
+		59BC0FED2946C0210091D064 /* Camera.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59BC0FEC2946C0210091D064 /* Camera.swift */; };
+		59BC0FEF2946C3180091D064 /* SwiftUIExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59BC0FEE2946C3180091D064 /* SwiftUIExtensions.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -81,6 +83,8 @@
 		597F398A29466C6600CF2C99 /* Vec3.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Vec3.swift; sourceTree = "<group>"; };
 		597F398C29466C9500CF2C99 /* Vec3Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Vec3Tests.swift; sourceTree = "<group>"; };
 		59BC0FEA2946AA000091D064 /* World.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = World.swift; sourceTree = "<group>"; };
+		59BC0FEC2946C0210091D064 /* Camera.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Camera.swift; sourceTree = "<group>"; };
+		59BC0FEE2946C3180091D064 /* SwiftUIExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUIExtensions.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -136,6 +140,7 @@
 				597F395929466C4A00CF2C99 /* RayTracerAppApp.swift */,
 				597F395B29466C4A00CF2C99 /* ContentView.swift */,
 				5955D30E294692EF00B4C5EF /* Helpers.swift */,
+				59BC0FEE2946C3180091D064 /* SwiftUIExtensions.swift */,
 				597F395D29466C4B00CF2C99 /* Assets.xcassets */,
 				597F395F29466C4B00CF2C99 /* RayTracerApp.entitlements */,
 				597F396029466C4B00CF2C99 /* Preview Content */,
@@ -177,6 +182,7 @@
 				5955D3102946A2AC00B4C5EF /* Hittable.swift */,
 				5955D3122946A39100B4C5EF /* Sphere.swift */,
 				59BC0FEA2946AA000091D064 /* World.swift */,
+				59BC0FEC2946C0210091D064 /* Camera.swift */,
 			);
 			path = Types;
 			sourceTree = "<group>";
@@ -326,6 +332,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				597F395C29466C4A00CF2C99 /* ContentView.swift in Sources */,
+				59BC0FEF2946C3180091D064 /* SwiftUIExtensions.swift in Sources */,
 				5955D30F294692EF00B4C5EF /* Helpers.swift in Sources */,
 				597F395A29466C4A00CF2C99 /* RayTracerAppApp.swift in Sources */,
 			);
@@ -337,6 +344,7 @@
 			files = (
 				59BC0FEB2946AA000091D064 /* World.swift in Sources */,
 				5955D3132946A39100B4C5EF /* Sphere.swift in Sources */,
+				59BC0FED2946C0210091D064 /* Camera.swift in Sources */,
 				5955D30B29468DD700B4C5EF /* Ray.swift in Sources */,
 				5955D30D294690FB00B4C5EF /* Image.swift in Sources */,
 				5955D3112946A2AC00B4C5EF /* Hittable.swift in Sources */,
@@ -427,6 +435,7 @@
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_DISABLE_SAFETY_CHECKS = NO;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
@@ -478,6 +487,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_DISABLE_SAFETY_CHECKS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 			};
 			name = Release;
