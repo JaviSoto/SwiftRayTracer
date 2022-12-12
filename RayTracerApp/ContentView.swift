@@ -71,12 +71,9 @@ struct ContentView: View {
                     }
 
                     Section(header: Text("Camera").fontWeight(.bold)) {
-                        Slider(value: $scene.camera.viewportHeight, in: -5...5, step: 0.1) {
-                            Text("Viewport Height: \(scene.camera.viewportHeight, specifier: "%.1f")")
+                        Slider(value: $scene.camera.verticalFoV.degrees, in: 5...180, step: 10) {
+                            Text("Vertical FoV: \(scene.camera.verticalFoV.degrees, specifier: "%.0f")º")
                                 .lineLimit(1)
-                        }
-                        .onChange(of: scene.camera.viewportHeight) { viewportHeight in
-                            scene.camera.viewportWidth = (RayTracer.Scene.aspectRatio) * viewportHeight
                         }
 
                         Slider(value: $scene.camera.focalLength, in: -5...5, step: 0.1) {

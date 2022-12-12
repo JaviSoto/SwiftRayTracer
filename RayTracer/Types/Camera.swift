@@ -6,25 +6,30 @@
 //
 
 import Foundation
+import SwiftUI
 
 public struct Camera: Equatable {
-    public var viewportWidth: Double {
+    public var aspectRatio: Double {
         didSet {
             updateParameters()
         }
     }
 
-    public var viewportHeight: Double {
+    public var verticalFoV: Angle {
         didSet {
             updateParameters()
         }
     }
 
-    public var focalLength: Double = 1
+    public var focalLength: Double = 1 {
+        didSet {
+            updateParameters()
+        }
+    }
 
-    public init(viewportWidth: Double, viewportHeight: Double) {
-        self.viewportWidth = viewportWidth
-        self.viewportHeight = viewportHeight
+    public init(aspectRatio: Double, verticalFoV: Angle = .degrees(90)) {
+        self.aspectRatio = aspectRatio
+        self.verticalFoV = verticalFoV
 
         updateParameters()
     }
@@ -39,13 +44,15 @@ public struct Camera: Equatable {
     // MARK: - Private
 
     private let rayOrigin = Point3(0)
-    private var aspectRatio: Double = 0
     private var horizontal: Vec3 = 0
     private var vertical: Vec3 = 0
     private var lowerLeftCorner: Vec3 = 0
 
     private mutating func updateParameters() {
-        self.aspectRatio = viewportWidth / viewportHeight
+        let theta = verticalFoV.radians
+        let h = tan(theta / 2)
+        let viewportHeight = 2 * h
+        let viewportWidth = aspectRatio * viewportHeight
         self.horizontal = Vec3(viewportWidth, 0, 0)
         self.vertical = Vec3(0, viewportHeight, 0)
         self.lowerLeftCorner = rayOrigin - horizontal / 2 - vertical / 2 - Vec3(0, 0, focalLength)

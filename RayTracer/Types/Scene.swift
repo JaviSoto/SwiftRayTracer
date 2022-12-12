@@ -26,7 +26,7 @@ public struct Scene: Equatable {
 
     public var maxBounces = 20
 
-    public var camera: Camera = .init(viewportWidth: 2 * Self.aspectRatio, viewportHeight: 2)
+    public var camera: Camera = .init(aspectRatio: Self.aspectRatio)
 
     public var world: World = .init(objects: [
         Sphere(center: .init(0.0, -100.5, -1.0), radius: 100, material: groundMaterial),
