@@ -8,8 +8,8 @@
 import Foundation
 
 public struct Sphere: Hittable {
-    var center: Point3
-    var radius: Double
+    public var center: Point3
+    public var radius: Double
 
     public init(center: Point3, radius: Double) {
         self.center = center

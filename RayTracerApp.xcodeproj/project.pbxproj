@@ -22,6 +22,7 @@
 		597F398129466C5700CF2C99 /* RayTracer.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 597F396D29466C5700CF2C99 /* RayTracer.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		597F398B29466C6600CF2C99 /* Vec3.swift in Sources */ = {isa = PBXBuildFile; fileRef = 597F398A29466C6600CF2C99 /* Vec3.swift */; };
 		597F398D29466C9500CF2C99 /* Vec3Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 597F398C29466C9500CF2C99 /* Vec3Tests.swift */; };
+		59BC0FEB2946AA000091D064 /* World.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59BC0FEA2946AA000091D064 /* World.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -79,6 +80,7 @@
 		597F397429466C5700CF2C99 /* RayTracerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RayTracerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		597F398A29466C6600CF2C99 /* Vec3.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Vec3.swift; sourceTree = "<group>"; };
 		597F398C29466C9500CF2C99 /* Vec3Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Vec3Tests.swift; sourceTree = "<group>"; };
+		59BC0FEA2946AA000091D064 /* World.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = World.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -174,6 +176,7 @@
 				5955D30C294690FB00B4C5EF /* Image.swift */,
 				5955D3102946A2AC00B4C5EF /* Hittable.swift */,
 				5955D3122946A39100B4C5EF /* Sphere.swift */,
+				59BC0FEA2946AA000091D064 /* World.swift */,
 			);
 			path = Types;
 			sourceTree = "<group>";
@@ -332,6 +335,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				59BC0FEB2946AA000091D064 /* World.swift in Sources */,
 				5955D3132946A39100B4C5EF /* Sphere.swift in Sources */,
 				5955D30B29468DD700B4C5EF /* Ray.swift in Sources */,
 				5955D30D294690FB00B4C5EF /* Image.swift in Sources */,

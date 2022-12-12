@@ -30,20 +30,17 @@ private struct Scene {
         var viewportHeight: Double = 2
         var focalLength: Double = 1
 
-        var sphereCenter: Point3 = .init(x: 0, y: 0, z: -1)
-        var sphereRadius: Double = 0.5
+        var world: World = .init(objects: [
+            Sphere(center: .init(x: 0, y: 0, z: -1), radius: 0.5),
+            Sphere(center: .init(x: 0, y: -100.5, z: -1), radius: 100),
+        ])
     }
 
     var parameters: Parameters = .init()
 
     private func rayColor(_ ray: Ray) -> Color3 {
-        let sphere = Sphere(center: parameters.sphereCenter, radius: parameters.sphereRadius)
-
-        if let sphereHit = sphere.hitTest(with: ray, validTRange: 0.0...(.greatestFiniteMagnitude)) {
-            if sphereHit.t > 0 {
-                let n: Vec3 = (sphereHit.point - Vec3(0, 0, -1)).normalized()
-                return 0.5 * Color3(n.x + 1, n.y + 1, n.z + 1)
-            }
+        if let worldHit = parameters.world.hitTest(with: ray, validTRange: 0.0...(.greatestFiniteMagnitude)) {
+            return 0.5 * (worldHit.normal + Color3(1))
         }
 
         let normalizedDirection = ray.direction
@@ -83,6 +80,39 @@ struct ContentView: View {
     @State
     private var scene: Scene = Scene()
 
+    private var sphereConfigurationView: some View {
+        ForEach(Array(scene.parameters.world.spheres.enumerated()), id: \.0) { index, sphere in
+            VStack {
+                Text("Position: (\(sphere.center.x, specifier: "%.1f"), \(sphere.center.y, specifier: "%.1f"), \(sphere.center.z, specifier: "%.1f"))")
+                    .lineLimit(1)
+                Slider(value: $scene.parameters.world.spheres[index].center.x, in: -100...100, step: 1) {
+                    Text("x: \(sphere.center.x)")
+                }
+                Slider(value: $scene.parameters.world.spheres[index].center.y, in: -100...100, step: 1) {
+                    Text("y: \(sphere.center.y)")
+                }
+                Slider(value: $scene.parameters.world.spheres[index].center.z, in: -100...100, step: 1) {
+                    Text("z: \(sphere.center.z)")
+                }
+                VStack {
+                    Slider(value: $scene.parameters.world.spheres[index].radius, in: 0...100, step: 0.5) {
+                        Text("Radius: \(sphere.radius, specifier: "%.1f")")
+                            .lineLimit(1)
+                    }
+                }
+
+                Button("Remove") {
+                    scene.parameters.world.spheres.remove(at: index)
+                }
+
+                Spacer()
+            }
+            .tabItem {
+                Text("\(index + 1)")
+            }
+        }
+    }
+
     private var configurationView: some View {
         Form {
             HStack(alignment: .top) {
@@ -104,26 +134,13 @@ struct ContentView: View {
 
                     Divider()
 
-                    Section(header: Text("Sphere:").fontWeight(.bold)) {
-                        VStack {
-                            Text("Position: (\(scene.parameters.sphereCenter.x, specifier: "%.1f"), \(scene.parameters.sphereCenter.y, specifier: "%.1f"), \(scene.parameters.sphereCenter.z, specifier: "%.1f"))")
-                                .lineLimit(1)
-                            Slider(value: $scene.parameters.sphereCenter.x, in: -10...10, step: 0.1) {
-                                Text("x: ")
-                            }
-                            Slider(value: $scene.parameters.sphereCenter.y, in: -10...10, step: 0.1) {
-                                Text("y: ")
-                            }
-                            Slider(value: $scene.parameters.sphereCenter.z, in: -10...10, step: 0.1) {
-                                Text("z: ")
-                            }
+                    Section(header: Text("Spheres:").fontWeight(.bold)) {
+                        TabView {
+                            sphereConfigurationView
                         }
 
-                        VStack {
-                            Slider(value: $scene.parameters.sphereRadius, in: 0...10, step: 0.1) {
-                                Text("Radius: \(scene.parameters.sphereRadius, specifier: "%.1f")")
-                                    .lineLimit(1)
-                            }
+                        Button("New Sphere") {
+                            scene.parameters.world.objects.append(Sphere(center: .init(0, 0, -1), radius: 0.3))
                         }
                     }
 
@@ -145,8 +162,25 @@ struct ContentView: View {
                 }
             }
 
-            configurationView
-                .frame(width: 200)
+            ZStack {
+                #if DEBUG
+                Text("Warning: Building without optimizations!")
+                #endif
+
+                configurationView
+                    .frame(width: 200)
+            }
+        }
+    }
+}
+
+private extension World {
+    var spheres: [Sphere] {
+        get {
+            return objects.compactMap { $0 as? Sphere }
+        }
+        set {
+            objects = newValue // TODO: keep the other objects in their indices too
         }
     }
 }
