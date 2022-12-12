@@ -11,12 +11,14 @@ import RayTracer
 struct Scene: Equatable {
     static let aspectRatio: Double = 16/9
 
-    var width: Int = 256
+    var width: Int = 512
     var height: Int {
         Int(Double(width) / Self.aspectRatio)
     }
 
-    var samplesPerPixel = 100
+    var samplesPerPixel = 1
+
+    var maxBounces = 10
 
     var camera: Camera = .init(viewportWidth: 2 * Self.aspectRatio, viewportHeight: 2)
 
@@ -25,9 +27,12 @@ struct Scene: Equatable {
         Sphere(center: .init(x: 0, y: -100.5, z: -1), radius: 100),
     ])
 
-    private func rayColor(_ ray: Ray) -> Color3 {
+    private func rayColor(_ ray: Ray, bouncesLeft: Int) -> Color3 {
+        guard bouncesLeft > 0 else { return Color3(0) }
+
         if let worldHit = world.hitTest(with: ray, validTRange: 0.0...(.greatestFiniteMagnitude)) {
-            return 0.5 * (worldHit.normal + Color3(1))
+            let target = worldHit.point + worldHit.normal + .randomInUnitSphere()
+            return 0.5 * rayColor(Ray(origin: worldHit.point, direction: target - worldHit.point), bouncesLeft: bouncesLeft - 1)
         }
 
         let normalizedDirection = ray.direction
@@ -45,10 +50,10 @@ struct Scene: Equatable {
                     (0..<width).map { x in
                         var pixelColor = Color3()
                         for _ in 0..<samplesPerPixel {
-                            let normalizedX = (Double(x) + Double.random(in: 0...1)) / Double(width - 1)
-                            let normalizedY = (Double(y) + Double.random(in: 0...1)) / Double(height - 1)
+                            let normalizedX = (Double(x) + .random(in: 0...1)) / Double(width - 1)
+                            let normalizedY = (Double(y) + .random(in: 0...1)) / Double(height - 1)
                             let ray = camera.ray(atNormalizedX: normalizedX, normalizedY: normalizedY)
-                            pixelColor += rayColor(ray)
+                            pixelColor += rayColor(ray, bouncesLeft: maxBounces)
                         }
 
                         pixelColor /= .init(Double(samplesPerPixel))

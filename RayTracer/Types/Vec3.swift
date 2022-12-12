@@ -156,6 +156,21 @@ extension Vec3: ExpressibleByFloatLiteral {
     }
 }
 
+// MARK: Random
+
+extension Vec3 {
+    public static func random(in range: ClosedRange<Double> = 0...1) -> Vec3 {
+        return Vec3(.random(in: range), .random(in: range), .random(in: range))
+    }
+
+    public static func randomInUnitSphere() -> Vec3 {
+        while true {
+            let vec = Self.random(in: -1...1)
+            if vec.lengthSquared < 1 { return vec }
+        }
+    }
+}
+
 // MARK: - Color Conversion
 
 import SwiftUI

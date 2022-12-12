@@ -17,16 +17,15 @@ struct ContentView: View {
     private var sphereConfigurationView: some View {
         ForEach(Array(scene.world.spheres.enumerated()), id: \.0) { index, sphere in
             VStack {
-                Text("Position: (\(sphere.center.x, specifier: "%.1f"), \(sphere.center.y, specifier: "%.1f"), \(sphere.center.z, specifier: "%.1f"))")
-                    .lineLimit(1)
+                Text("Position:")
                 Slider(value: $scene.world.spheres[index].center.x, in: -100...100, step: 1) {
-                    Text("x: \(sphere.center.x)")
+                    Text("x: \(sphere.center.x, specifier: "%.1f")")
                 }
                 Slider(value: $scene.world.spheres[index].center.y, in: -100...100, step: 1) {
-                    Text("y: \(sphere.center.y)")
+                    Text("y: \(sphere.center.y, specifier: "%.1f")")
                 }
                 Slider(value: $scene.world.spheres[index].center.z, in: -100...100, step: 1) {
-                    Text("z: \(sphere.center.z)")
+                    Text("z: \(sphere.center.z, specifier: "%.1f")")
                 }
                 VStack {
                     Slider(value: $scene.world.spheres[index].radius, in: 0...100, step: 0.5) {
@@ -62,6 +61,11 @@ struct ContentView: View {
 
                         Slider(javivalue: $scene.samplesPerPixel, in: 1...100, step: 1) {
                             Text("Samples per pixel: \(scene.samplesPerPixel)")
+                                .lineLimit(1)
+                        }
+
+                        Slider(javivalue: $scene.maxBounces, in: 1...100, step: 1) {
+                            Text("Max bounces: \(scene.maxBounces)")
                                 .lineLimit(1)
                         }
                     }
@@ -136,7 +140,7 @@ final class Renderer: ObservableObject {
         task = DispatchWorkItem {
             guard !task.isCancelled else { return }
 
-            let image = measure("\(scene.width)x\(scene.height) (\(scene.samplesPerPixel) samples per pixel) scene") {
+            let image = measure("\(scene.width)x\(scene.height) (\(scene.samplesPerPixel) samples per pixel, \(scene.maxBounces) max bounces) scene") {
                 return scene
                     .render()
                     .asSwiftUIImage()
