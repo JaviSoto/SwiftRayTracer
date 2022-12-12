@@ -81,7 +81,7 @@ extension Vec3 {
         )
     }
 
-    static func -= (lhs: inout Vec3, rhs: Vec3) {
+    public static func -= (lhs: inout Vec3, rhs: Vec3) {
         lhs = lhs - rhs
     }
 
@@ -93,7 +93,7 @@ extension Vec3 {
         )
     }
 
-    static func += (lhs: inout Vec3, rhs: Vec3) {
+    public static func += (lhs: inout Vec3, rhs: Vec3) {
         lhs = lhs + rhs
     }
 
@@ -109,7 +109,7 @@ extension Vec3 {
         )
     }
 
-    static func /= (lhs: inout Vec3, rhs: Vec3) {
+    public static func /= (lhs: inout Vec3, rhs: Vec3) {
         lhs = lhs / rhs
     }
 

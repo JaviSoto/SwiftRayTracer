@@ -54,6 +54,13 @@ struct ContentView: View {
                     Text("Parameters")
                         .font(.largeTitle)
 
+                    Section(header: Text("Configuration").fontWeight(.bold)) {
+                        Slider(javivalue: $scene.samplesPerPixel, in: 1...100, step: 1) {
+                            Text("Samples per pixel: \(scene.samplesPerPixel)")
+                                .lineLimit(1)
+                        }
+                    }
+
                     Section(header: Text("Viewport").fontWeight(.bold)) {
                         Slider(value: $scene.camera.viewportHeight, in: -5...5, step: 0.1) {
                             Text("Height: \(scene.camera.viewportHeight, specifier: "%.1f")")
@@ -87,8 +94,11 @@ struct ContentView: View {
 
     var body: some View {
         HStack {
-            measure("\(width)x\(height) scene") {
-                scene.render(width: width, height: height).asSwiftUIImage()
+            measure("\(width)x\(height) (\(scene.samplesPerPixel) samples per pixel) scene") {
+                scene
+                    .render(width: 100, height: 100)
+                    .asSwiftUIImage()
+                    .resizable()
             }
             .onSizeChange { size in
                 width = Int(size.width)

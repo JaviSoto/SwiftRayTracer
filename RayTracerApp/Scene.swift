@@ -16,6 +16,8 @@ struct Scene {
         Sphere(center: .init(x: 0, y: -100.5, z: -1), radius: 100),
     ])
 
+    var samplesPerPixel = 1
+
     private func rayColor(_ ray: Ray) -> Color3 {
         if let worldHit = world.hitTest(with: ray, validTRange: 0.0...(.greatestFiniteMagnitude)) {
             return 0.5 * (worldHit.normal + Color3(1))
@@ -35,11 +37,17 @@ struct Scene {
             pixels:
                 (0..<height).reversed().flatMap { y in
                     (0..<width).map { x in
-                        let normalizedX = Double(x) / Double(width - 1)
-                        let normalizedY = Double(y) / Double(height - 1)
-                        let ray = camera.ray(atNormalizedX: normalizedX, normalizedY: normalizedY)
+                        var pixelColor = Color3()
+                        for _ in 0..<samplesPerPixel {
+                            let normalizedX = (Double(x) + Double.random(in: 0...1)) / Double(width - 1)
+                            let normalizedY = (Double(y) + Double.random(in: 0...1)) / Double(height - 1)
+                            let ray = camera.ray(atNormalizedX: normalizedX, normalizedY: normalizedY)
+                            pixelColor += rayColor(ray)
+                        }
 
-                        return rayColor(ray)
+                        pixelColor /= .init(Double(samplesPerPixel))
+
+                        return pixelColor
                     }
                 }
             , width: width)
