@@ -7,7 +7,6 @@
 
 import Foundation
 
-private let groundMaterial = Lambertian(albedo: Color3(0.8, 0.8, 0))
 private let centerMaterial = Lambertian(albedo: Color3(0.1, 0.2, 0.5))
 private let leftMaterial = Dielectric(refractionIndex: 1.5)
 private let rightMaterial = Metal(albedo: Color3(0.8, 0.6, 0.2), fuzz: 0)
@@ -26,25 +25,62 @@ public struct Scene: Equatable {
 
     public var maxBounces = 20
 
-    private static let defaultCameraOrigin = Vec3(3, 3, 2)
-    private static let defaultCameraTarget = Vec3(0, 0, -1)
+    private static let defaultCameraOrigin = Vec3(13, 2, 3)
+    private static let defaultCameraTarget = Vec3(0, 0, 0)
 
     public var camera = Camera(
         aspectRatio: Self.aspectRatio,
         verticalFoV: .degrees(20),
-        aperture: 2.0,
-        focusDistance: (Self.defaultCameraOrigin - Self.defaultCameraTarget).length,
+        aperture: 0.1,
+        focusDistance: 10,
         origin: Self.defaultCameraOrigin,
         target: Self.defaultCameraTarget
     )
 
-    public var world: World = .init(objects: [
-        Sphere(center: .init(0.0, -100.5, -1.0), radius: 100, material: groundMaterial),
-        Sphere(center: .init(0.0, 0.0, -1.0), radius: 0.5, material: centerMaterial),
-        Sphere(center: .init(-1.0, 0.0, -1.0), radius: 0.5, material: leftMaterial),
-        Sphere(center: .init(-1.0, 0.0, -1.0), radius: -0.45, material: leftMaterial),
-        Sphere(center: .init(1.0, 0.0, -1.0), radius: 0.5, material: rightMaterial)
-    ])
+    public var world: World = {
+        var objects: [Sphere] = []
+
+        let groundMaterial = Lambertian(albedo: Color3(0.5, 0.5, 0.5))
+        objects.append(Sphere(center: Vec3(0, -1000, 0), radius: 1000, material: groundMaterial))
+
+        for a in -11..<11 {
+            for b in -1..<11 {
+                let materialOption = Double.random(in: 0...1)
+                let center = Point3(Double(a) + 0.9 * Double.random(in: 0...1), 0.2, Double(b) + 0.9 * Double.random(in: 0...1))
+
+                if (center - Point3(4, 0.2, 0)).length > 0.9 {
+                    let sphereMaterial: any Material
+
+                    if materialOption < 0.8 {
+                        // diffuse
+                        let albedo = Color3.random(in: 0...1) * Color3.random(in: 0...1)
+                        sphereMaterial = Lambertian(albedo: albedo)
+                    } else if materialOption < 0.95 {
+                        // metal
+                        let albedo = Color3.random(in: 0.5...1)
+                        let fuzz = Double.random(in: 0...0.5)
+                        sphereMaterial = Metal(albedo: albedo, fuzz: fuzz)
+                    } else {
+                        // glass
+                        sphereMaterial = Dielectric(refractionIndex: 1.5)
+                    }
+
+                    objects.append(Sphere(center: center, radius: 0.2, material: sphereMaterial))
+                }
+            }
+        }
+
+        let material1 = Dielectric(refractionIndex: 1.5)
+        objects.append(Sphere(center: Point3(0, 1, 0), radius: 1, material: material1))
+
+        let material2 = Lambertian(albedo: Color3(0.4, 0.2, 0.1))
+        objects.append(Sphere(center: Point3(-4, 1, 0), radius: 1, material: material2))
+
+        let material3 = Metal(albedo: Color3(0.7, 0.6, 0.5), fuzz: 0)
+        objects.append(Sphere(center: Point3(4, 1, 0), radius: 1, material: material3))
+
+        return World(objects: objects)
+    }()
 
     private func rayColor(_ ray: Ray, bouncesLeft: Int) -> Color3 {
         guard bouncesLeft > 0 else { return Color3(0) }

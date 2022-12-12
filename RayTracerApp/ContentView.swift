@@ -76,14 +76,17 @@ struct ContentView: View {
             }
 
             Divider()
-            if renderer.rendering {
-                ProgressView()
-                    .progressViewStyle(.linear)
-            } else {
-                Button("Render") {
-                    renderer.render(scene)
+            Group {
+                if renderer.rendering {
+                    ProgressView()
+                        .progressViewStyle(.linear)
+                } else {
+                    Button("Render") {
+                        renderer.render(scene)
+                    }
                 }
             }
+            .padding()
         }
         .padding(.vertical)
     }
