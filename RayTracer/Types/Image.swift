@@ -28,19 +28,23 @@ import SwiftUI
 
 extension Image {
     public func asSwiftUIImage() -> SwiftUI.Image {
-        var pixels = pixels.map(\.sRGBAValue)
-        let cgImage = pixels.withUnsafeMutableBytes { ptr -> CGImage in
-            return CGContext(
-                data: ptr.baseAddress,
-                width: width,
-                height: height,
-                bitsPerComponent: 8,
-                bytesPerRow: 4 * width,
-                space: CGColorSpace(name: CGColorSpace.sRGB)!,
-                bitmapInfo: CGBitmapInfo.byteOrder32Little.rawValue +
-                CGImageAlphaInfo.premultipliedLast.rawValue
-            )!.makeImage()!
-        }
+        let pixels = pixels.map(\.sRGBAValue)
+
+        let providerRef = CGDataProvider(data: NSData(bytes: pixels, length: width * height * 4))
+
+        let cgImage = CGImage(
+            width: width,
+            height: height,
+            bitsPerComponent: 8,
+            bitsPerPixel: 4 * 8,
+            bytesPerRow: 4 * width,
+            space: CGColorSpaceCreateDeviceRGB(),
+            bitmapInfo: .byteOrder32Little,
+            provider: providerRef!,
+            decode: nil,
+            shouldInterpolate: true,
+            intent: .defaultIntent
+        )!
 
         return SwiftUI.Image(decorative: cgImage, scale: 1)
     }
