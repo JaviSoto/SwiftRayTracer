@@ -32,6 +32,7 @@ public struct Scene: Equatable {
         Sphere(center: .init(0.0, -100.5, -1.0), radius: 100, material: groundMaterial),
         Sphere(center: .init(0.0, 0.0, -1.0), radius: 0.5, material: centerMaterial),
         Sphere(center: .init(-1.0, 0.0, -1.0), radius: 0.5, material: leftMaterial),
+        Sphere(center: .init(-1.0, 0.0, -1.0), radius: -0.4, material: leftMaterial),
         Sphere(center: .init(1.0, 0.0, -1.0), radius: 0.5, material: rightMaterial)
     ])
 

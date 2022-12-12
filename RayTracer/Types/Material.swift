@@ -74,17 +74,24 @@ public struct Dielectric: Material {
         let cosTheta = fmin((-normalizedDirection • hitResult.normal), 1.0)
         let sinTheta = (1.0 - cosTheta * cosTheta).squareRoot()
 
-        let canRefract = refractionRatio * sinTheta <= 1.0
+        let cannonRefract = refractionRatio * sinTheta > 1.0
 
         let direction: Vec3
-        if canRefract {
-            direction = normalizedDirection.refract(hitResult.normal, etaiOverEtat: refractionRatio)
-        } else {
+        if cannonRefract || reflectance(cosine: cosTheta, refractionRatio: refractionRatio) > Double.random(in: 0...1) {
             direction = normalizedDirection.reflect(hitResult.normal)
+        } else {
+            direction = normalizedDirection.refract(hitResult.normal, etaiOverEtat: refractionRatio)
         }
 
         let scatteredRay = Ray(origin: hitResult.point, direction: direction)
 
         return Scatter(attenuation: attenuation, scatteredRay: scatteredRay)
+    }
+
+    private func reflectance(cosine: Double, refractionRatio: Double) -> Double {
+        // Use Schlick's approximation for reflectance.
+        var r0 = (1 - refractionRatio) / (1 + refractionRatio)
+        r0 *= r0
+        return r0 + ( 1 - r0) * pow ((1 - cosine), 5)
     }
 }
