@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct World: Hittable {
+public struct World: Hittable, Equatable {
     public var objects: [any Hittable]
 
     public init(objects: [any Hittable]) {
@@ -27,4 +27,20 @@ public struct World: Hittable {
 
         return hitResult
     }
+
+    public static func == (lhs: World, rhs: World) -> Bool {
+        guard lhs.objects.count == rhs.objects.count else { return false }
+
+        for (l, r) in zip(lhs.objects, rhs.objects) {
+            let casted = l as any Equatable
+            guard equals(casted, r) else { return false }
+        }
+
+        return true
+    }
+}
+
+private func equals<T: Equatable>(_ lhs: T, _ rhs: Any) -> Bool {
+    guard let casted = rhs as? T else { return false }
+    return lhs == casted
 }

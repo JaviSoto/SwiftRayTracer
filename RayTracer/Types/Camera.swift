@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct Camera {
+public struct Camera: Equatable {
     public var viewportWidth: Double {
         didSet {
             updateParameters()

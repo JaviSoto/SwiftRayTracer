@@ -19,6 +19,6 @@ public struct HitResult {
     }
 }
 
-public protocol Hittable {
+public protocol Hittable: Equatable {
     func hitTest(with ray: Ray, validTRange: ClosedRange<Double>) -> HitResult?
 }

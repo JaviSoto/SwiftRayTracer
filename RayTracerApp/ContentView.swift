@@ -9,10 +9,10 @@ import SwiftUI
 import RayTracer
 
 struct ContentView: View {
-    @State private var width: Int = 10
-    @State private var height: Int = 10
-
     @State private var scene: Scene = Scene()
+
+    @ObservedObject
+    private var renderer = Renderer()
 
     private var sphereConfigurationView: some View {
         ForEach(Array(scene.world.spheres.enumerated()), id: \.0) { index, sphere in
@@ -54,17 +54,25 @@ struct ContentView: View {
                     Text("Parameters")
                         .font(.largeTitle)
 
-                    Section(header: Text("Configuration").fontWeight(.bold)) {
+                    Section(header: Text("Render").fontWeight(.bold)) {
+                        Slider(javivalue: $scene.width, in: 100...1024, step: 10) {
+                            Text("Width: \(scene.width)")
+                                .lineLimit(1)
+                        }
+
                         Slider(javivalue: $scene.samplesPerPixel, in: 1...100, step: 1) {
                             Text("Samples per pixel: \(scene.samplesPerPixel)")
                                 .lineLimit(1)
                         }
                     }
 
-                    Section(header: Text("Viewport").fontWeight(.bold)) {
+                    Section(header: Text("Camera").fontWeight(.bold)) {
                         Slider(value: $scene.camera.viewportHeight, in: -5...5, step: 0.1) {
-                            Text("Height: \(scene.camera.viewportHeight, specifier: "%.1f")")
+                            Text("Viewport Height: \(scene.camera.viewportHeight, specifier: "%.1f")")
                                 .lineLimit(1)
+                        }
+                        .onChange(of: scene.camera.viewportHeight) { viewportHeight in
+                            scene.camera.viewportWidth = (Scene.aspectRatio) * viewportHeight
                         }
 
                         Slider(value: $scene.camera.focalLength, in: -5...5, step: 0.1) {
@@ -94,17 +102,9 @@ struct ContentView: View {
 
     var body: some View {
         HStack {
-            measure("\(width)x\(height) (\(scene.samplesPerPixel) samples per pixel) scene") {
-                scene
-                    .render(width: 100, height: 100)
-                    .asSwiftUIImage()
-                    .resizable()
-            }
-            .onSizeChange { size in
-                width = Int(size.width)
-                height = Int(size.height)
-                scene.camera.viewportWidth = (size.width / size.height) * scene.camera.viewportHeight
-            }
+            renderer.renderedImage
+                .resizable()
+                .aspectRatio(Scene.aspectRatio, contentMode: .fit)
 
             ZStack {
                 #if DEBUG
@@ -115,6 +115,43 @@ struct ContentView: View {
                     .frame(width: 200)
             }
         }
+        .onAppear {
+            renderer.render(scene)
+        }
+        .onChange(of: scene) { scene in
+            renderer.render(scene)
+        }
+    }
+}
+
+@MainActor
+final class Renderer: ObservableObject {
+    @Published
+    var renderedImage: SwiftUI.Image = SwiftUI.Image(systemName: "arrow.triangle.2.circlepath.circle.fill")
+
+    private var lastTask: DispatchWorkItem?
+
+    func render(_ scene: Scene) {
+        var task: DispatchWorkItem!
+        task = DispatchWorkItem {
+            guard !task.isCancelled else { return }
+
+            let image = measure("\(scene.width)x\(scene.height) (\(scene.samplesPerPixel) samples per pixel) scene") {
+                return scene
+                    .render()
+                    .asSwiftUIImage()
+            }
+
+            DispatchQueue.main.async {
+                guard !task.isCancelled else { return }
+
+                self.renderedImage = image
+            }
+        }
+
+        lastTask = task
+
+        DispatchQueue.global(qos: .userInitiated).async(execute: task)
     }
 }
 
