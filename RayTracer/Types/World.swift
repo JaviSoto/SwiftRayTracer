@@ -8,9 +8,9 @@
 import Foundation
 
 public struct World: Hittable, Equatable {
-    public var objects: [any Hittable]
+    public var objects: [Sphere]
 
-    public init(objects: [any Hittable]) {
+    public init(objects: [Sphere]) {
         self.objects = objects
     }
 
