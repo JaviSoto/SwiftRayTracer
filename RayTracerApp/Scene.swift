@@ -47,7 +47,7 @@ struct Scene: Equatable {
         return Image(
             pixels:
                 (0..<height).reversed().flatMap { y in
-                    (0..<width).map { x in
+                    (0..<width).parallelMap { x in
                         var pixelColor = Color3()
                         for _ in 0..<samplesPerPixel {
                             let normalizedX = (Double(x) + .random(in: 0...1)) / Double(width - 1)
@@ -62,5 +62,17 @@ struct Scene: Equatable {
                     }
                 }
             , width: width)
+    }
+}
+
+extension RandomAccessCollection where Index == Int {
+    func parallelMap<U>(_ f: @escaping (Element) -> U) -> [U] {
+        return Array(unsafeUninitializedCapacity: count) { buffer, initializedCount in
+            DispatchQueue.concurrentPerform(iterations: count) { i in
+                buffer[i] = f(self[i])
+            }
+
+            initializedCount = count
+        }
     }
 }
