@@ -10,10 +10,12 @@ import Foundation
 public struct Sphere: Hittable {
     public var center: Point3
     public var radius: Double
+    public var material: any Material
 
-    public init(center: Point3, radius: Double) {
+    public init(center: Point3, radius: Double, material: any Material) {
         self.center = center
         self.radius = radius
+        self.material = material
     }
 
     public func hitTest(with ray: Ray, validTRange: ClosedRange<Double>) -> HitResult? {
@@ -36,9 +38,15 @@ public struct Sphere: Hittable {
         let point = ray.point(at: root)
         let outwardNormal = (point - center) / Vec3(radius)
 
-        var hitResult = HitResult(point: point, normal: 0, t: root)
+        var hitResult = HitResult(point: point, normal: 0, material: material, t: root)
         hitResult.setFaceNormal(with: ray, outwardNormal: outwardNormal)
 
         return hitResult
+    }
+
+    public static func == (lhs: Sphere, rhs: Sphere) -> Bool {
+        return lhs.center == rhs.center
+        && lhs.radius == rhs.radius
+        && equals(lhs.material, rhs.material)
     }
 }

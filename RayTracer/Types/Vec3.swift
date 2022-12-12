@@ -54,6 +54,15 @@ extension Vec3 {
     public func normalized() -> Vec3 {
         return self / .init(self.length)
     }
+
+    /// Returns true if `self` is close to zero in all dimensions.
+    public var isNearZero: Bool {
+        let threshold = 1e-8
+
+        return fabs(x) < threshold
+        && fabs(y) < threshold
+        && fabs(z) < threshold
+    }
 }
 
 // MARK: - CustomSringConvertible {
@@ -139,6 +148,14 @@ extension Vec3 {
             lhs.z * rhs.x - lhs.x * rhs.z,
             lhs.x * rhs.y - lhs.y * rhs.x
         )
+    }
+}
+
+// MARK: - Physics
+
+extension Vec3 {
+    public func reflect(_ v: Vec3) -> Vec3 {
+        return self - 2 * Vec3(self • v) * v
     }
 }
 

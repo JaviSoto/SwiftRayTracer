@@ -93,7 +93,7 @@ struct ContentView: View {
                         }
 
                         Button("New Sphere") {
-                            scene.world.objects.append(Sphere(center: .init(0, 0, -1), radius: 0.3))
+                            scene.world.objects.append(Sphere(center: .init(0, 0, -1), radius: 0.3, material: Lambertian(albedo: Color3(1, 0, 0))))
                         }
                     }
 

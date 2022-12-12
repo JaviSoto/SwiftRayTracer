@@ -7,33 +7,46 @@
 
 import Foundation
 
+extension Lambertian {
+    static let groundMaterial = Lambertian(albedo: Color3(0.8, 0.8, 0))
+    static let centerMaterial = Lambertian(albedo: Color3(0.7, 0.3, 0.3))
+}
+
+extension Metal {
+    static let leftMaterial = Metal(albedo: Color3(0.8, 0.8, 0.8), fuzz: 0.3)
+    static let rightMaterial = Metal(albedo: Color3(0.8, 0.6, 0.2), fuzz: 1)
+}
+
 public struct Scene: Equatable {
     public init() {}
 
     public static let aspectRatio: Double = 16/9
 
-    public var width: Int = 300
+    public var width: Int = 400
     public var height: Int {
         Int(Double(width) / Self.aspectRatio)
     }
 
-    public var samplesPerPixel = 20
+    public var samplesPerPixel = 50
 
     public var maxBounces = 20
 
     public var camera: Camera = .init(viewportWidth: 2 * Self.aspectRatio, viewportHeight: 2)
 
     public var world: World = .init(objects: [
-        Sphere(center: .init(x: 0, y: 0, z: -1), radius: 0.5),
-        Sphere(center: .init(x: 0, y: -100.5, z: -1), radius: 100),
+        Sphere(center: .init(0.0, -100.5, -1.0), radius: 100, material: Lambertian.groundMaterial),
+        Sphere(center: .init(0.0, 0.0, -1.0), radius: 0.5, material: Lambertian.centerMaterial),
+        Sphere(center: .init(-1.0, 0.0, -1.0), radius: 0.5, material: Metal.leftMaterial),
+        Sphere(center: .init(1.0, 0.0, -1.0), radius: 0.5, material: Metal.rightMaterial)
     ])
 
     private func rayColor(_ ray: Ray, bouncesLeft: Int) -> Color3 {
         guard bouncesLeft > 0 else { return Color3(0) }
 
         if let worldHit = world.hitTest(with: ray, validTRange: 0.001...(.greatestFiniteMagnitude)) {
-            let target = worldHit.point + .randomInHemisphere(normal: worldHit.normal)
-            return 0.5 * rayColor(Ray(origin: worldHit.point, direction: target - worldHit.point), bouncesLeft: bouncesLeft - 1)
+            if let scatter = worldHit.material.scatter(rayIn: ray, hitResult: worldHit) {
+                return scatter.attenuation * rayColor(scatter.scatteredRay, bouncesLeft: bouncesLeft - 1)
+            }
         }
 
         let normalizedDirection = ray.direction

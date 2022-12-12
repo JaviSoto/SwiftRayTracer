@@ -39,8 +39,3 @@ public struct World: Hittable, Equatable {
         return true
     }
 }
-
-private func equals<T: Equatable>(_ lhs: T, _ rhs: Any) -> Bool {
-    guard let casted = rhs as? T else { return false }
-    return lhs == casted
-}

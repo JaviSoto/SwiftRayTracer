@@ -10,6 +10,7 @@ import Foundation
 public struct HitResult {
     public var point: Point3
     public var normal: Vec3
+    public var material: any Material
     public var t: Double
     public var frontFace: Bool = true
 
