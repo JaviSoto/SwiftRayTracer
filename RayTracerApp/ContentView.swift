@@ -15,20 +15,14 @@ struct ContentView: View {
     private var renderer = Renderer()
 
     private var sphereConfigurationView: some View {
-        ForEach(Array(scene.world.spheres.enumerated()), id: \.0) { index, sphere in
+        ForEach(Array(scene.world.objects.enumerated()), id: \.0) { index, sphere in
             VStack {
-                Vec3Sliders(name: "Position", vector: $scene.world.spheres[index].center, range: -100...100, step: 1)
-
-                VStack {
-                    Slider(value: $scene.world.spheres[index].radius, in: 0...100, step: 0.5) {
-                        Text("Radius: \(sphere.radius, specifier: "%.1f")")
-                            .lineLimit(1)
-                    }
-                }
+                Vec3Sliders(name: "Position", vector: $scene.world.objects[index].center, range: -100...100, step: 1)
+                ValueSlider(name: "Radius", value: $scene.world.objects[index].radius, range: 0...100, step: 0.5, decimalPoints: 1)
 
                 HStack {
                     Button("Remove") {
-                        scene.world.spheres.remove(at: index)
+                        scene.world.objects.remove(at: index)
                     }
 
                     Button("New Sphere") {
@@ -53,33 +47,15 @@ struct ContentView: View {
                             .font(.largeTitle)
 
                         Section(header: Text("Render").fontWeight(.bold)) {
-                            Slider(value: $scene.width, in: 100...1024, step: 10) {
-                                Text("Width: \(scene.width)")
-                                    .lineLimit(1)
-                            }
-
-                            Slider(value: $scene.samplesPerPixel, in: 1...100, step: 1) {
-                                Text("Samples per pixel: \(scene.samplesPerPixel)")
-                                    .lineLimit(1)
-                            }
-
-                            Slider(value: $scene.maxBounces, in: 1...100, step: 1) {
-                                Text("Max bounces: \(scene.maxBounces)")
-                                    .lineLimit(1)
-                            }
+                            ValueSlider(name: "Width", value: $scene.width.double, range: 100...1024, step: 10, decimalPoints: 0, unit: "px")
+                            ValueSlider(name: "Samples per pixel", value: $scene.samplesPerPixel.double, range: 1...100, step: 1, decimalPoints: 0)
+                            ValueSlider(name: "Max bounces", value: $scene.maxBounces.double, range: 1...100, step: 1, decimalPoints: 0)
                         }
 
                         Section(header: Text("Camera").fontWeight(.bold)) {
-                            Slider(value: $scene.camera.parameters.verticalFoV.degrees, in: 5...180, step: 10) {
-                                Text("Vertical FoV: \(scene.camera.parameters.verticalFoV.degrees, specifier: "%.0f")º")
-                                    .lineLimit(1)
-                            }
-
-                            Slider(value: $scene.camera.parameters.focalLength, in: -5...5, step: 0.1) {
-                                Text("Focal Length: \(scene.camera.parameters.focalLength, specifier: "%.1f")")
-                                    .lineLimit(1)
-                            }
-
+                            ValueSlider(name: "Vertical FoV", value: $scene.camera.parameters.verticalFoV.degrees, range: 5...180, step: 10, decimalPoints: 0, unit: "º")
+                            ValueSlider(name: "Aperture", value: $scene.camera.parameters.aperture, range: 1...2, step: 0.1, decimalPoints: 1)
+                            ValueSlider(name: "Focus Distance", value: $scene.camera.parameters.focusDistance, range: 0...100, step: 1, decimalPoints: 0)
                             Vec3Sliders(name: "Origin", vector: $scene.camera.parameters.origin, range: -10...10, step: 1)
                             Vec3Sliders(name: "Target", vector: $scene.camera.parameters.target, range: -10...10, step: 1)
                             Vec3Sliders(name: "Up direction", vector: $scene.camera.parameters.upDirection, range: -1...1, step: 0.1)
@@ -100,10 +76,14 @@ struct ContentView: View {
             }
 
             Divider()
-            Button("Render") {
-                renderer.render(scene)
+            if renderer.rendering {
+                ProgressView()
+                    .progressViewStyle(.linear)
+            } else {
+                Button("Render") {
+                    renderer.render(scene)
+                }
             }
-            .disabled(renderer.rendering)
         }
         .padding(.vertical)
     }
@@ -119,11 +99,6 @@ struct ContentView: View {
                     Spacer()
                         .frame(maxWidth: .infinity)
                 }
-
-                if renderer.rendering {
-                    ProgressView()
-                        .progressViewStyle(.circular)
-                }
             }
 
             ZStack {
@@ -134,28 +109,6 @@ struct ContentView: View {
                 configurationView
                     .frame(width: 200)
             }
-        }
-    }
-}
-
-private struct Vec3Sliders: View {
-    var name: String
-    @Binding
-    var vector: Vec3
-    var range: ClosedRange<Double>
-    var step: Double
-
-    var body: some View {
-        Text("\(name):")
-
-        Slider(value: $vector.x, in: range, step: step) {
-            Text("x: \(vector.x, specifier: "%.1f")")
-        }
-        Slider(value: $vector.y, in: range, step: step) {
-            Text("y: \(vector.y, specifier: "%.1f")")
-        }
-        Slider(value: $vector.z, in: range, step: step) {
-            Text("z: \(vector.z, specifier: "%.1f")")
         }
     }
 }
@@ -200,17 +153,6 @@ final class Renderer: ObservableObject {
         lastTask = task
 
         DispatchQueue.global(qos: .userInitiated).asyncAfter(deadline: .now() + .milliseconds(100), execute: task)
-    }
-}
-
-private extension World {
-    var spheres: [Sphere] {
-        get {
-            return objects.compactMap { $0 as? Sphere }
-        }
-        set {
-            objects = newValue // TODO: keep the other objects in their indices too
-        }
     }
 }
 

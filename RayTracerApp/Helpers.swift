@@ -21,3 +21,10 @@ func measure<T>(_ name: String, _ f: () -> T) -> T {
 
     return result
 }
+
+extension Int {
+    var double: Double {
+        get { return Double(self) }
+        set { self = Int(exactly: newValue)! }
+    }
+}

@@ -12,15 +12,17 @@ public struct Camera: Equatable {
     public struct Parameters: Equatable {
         public var aspectRatio: Double
         public var verticalFoV: Angle
-        public var focalLength: Double
+        public var aperture: Double
+        public var focusDistance: Double
         public var origin: Point3
         public var target: Point3
         public var upDirection: Vec3
 
-        public init(aspectRatio: Double, verticalFoV: Angle, focalLength: Double = 1, origin: Point3, target: Point3, upDirection: Vec3) {
+        public init(aspectRatio: Double, verticalFoV: Angle, aperture: Double, focusDistance: Double, origin: Point3, target: Point3, upDirection: Vec3) {
             self.aspectRatio = aspectRatio
             self.verticalFoV = verticalFoV
-            self.focalLength = focalLength
+            self.aperture = aperture
+            self.focusDistance = focusDistance
             self.origin = origin
             self.target = target
             self.upDirection = upDirection
@@ -33,16 +35,27 @@ public struct Camera: Equatable {
         }
     }
 
-    public init(aspectRatio: Double, verticalFoV: Angle = .degrees(90), origin: Point3, target: Point3, upDirection: Vec3 = .init(0, 1, 0)) {
-        self.parameters = .init(aspectRatio: aspectRatio, verticalFoV: verticalFoV, origin: origin, target: target, upDirection: upDirection)
+    public init(aspectRatio: Double, verticalFoV: Angle, aperture: Double, focusDistance: Double, origin: Point3, target: Point3, upDirection: Vec3 = .init(0, 1, 0)) {
+        self.parameters = .init(
+            aspectRatio: aspectRatio,
+            verticalFoV: verticalFoV,
+            aperture: aperture,
+            focusDistance: focusDistance,
+            origin: origin,
+            target: target,
+            upDirection: upDirection
+        )
 
         updateParameters()
     }
 
     public func ray(atNormalizedX x: Double, normalizedY y: Double) -> Ray {
+        let rd = Vec3(lensRadius) * .randomInUnitDisk()
+        let offset = u * Vec3(rd.x) + v * Vec3(rd.y)
+
         return Ray(
-            origin: parameters.origin,
-            direction: lowerLeftCorner + Vec3(x) * horizontal + Vec3(y) * vertical - parameters.origin
+            origin: parameters.origin + offset,
+            direction: lowerLeftCorner + Vec3(x) * horizontal + Vec3(y) * vertical - parameters.origin - offset
         )
     }
 
@@ -51,18 +64,23 @@ public struct Camera: Equatable {
     private var horizontal: Vec3 = 0
     private var vertical: Vec3 = 0
     private var lowerLeftCorner: Vec3 = 0
+    private var lensRadius: Double = 0
+    private var u = Vec3()
+    private var v = Vec3()
+    private var w = Vec3()
 
     private mutating func updateParameters() {
         let theta = parameters.verticalFoV.radians
         let h = tan(theta / 2)
         let viewportHeight = 2 * h
         let viewportWidth = parameters.aspectRatio * viewportHeight
-        let w = (parameters.origin - parameters.target).normalized
-        let u = (parameters.upDirection ⨯ w).normalized
-        let v = w ⨯ u
+        w = (parameters.origin - parameters.target).normalized
+        u = (parameters.upDirection ⨯ w).normalized
+        v = w ⨯ u
 
-        self.horizontal = Vec3(viewportWidth) * u
-        self.vertical = Vec3(viewportHeight) * v
-        self.lowerLeftCorner = parameters.origin - horizontal / 2 - vertical / 2 - w
+        self.horizontal = Vec3(parameters.focusDistance) * Vec3(viewportWidth) * u
+        self.vertical = Vec3(parameters.focusDistance) * Vec3(viewportHeight) * v
+        self.lowerLeftCorner = parameters.origin - horizontal / 2 - vertical / 2 - Vec3(parameters.focusDistance) * w
+        self.lensRadius = parameters.aperture / 2
     }
 }

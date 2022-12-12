@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import RayTracer
 
 private struct ViewSizePreferenceKey: PreferenceKey {
     typealias Value = CGSize
@@ -30,13 +31,41 @@ extension View {
     }
 }
 
-extension Slider where ValueLabel == EmptyView {
-    init(value: Binding<Int>, in bounds: ClosedRange<Int>, step: Int, label: () -> Label) {
-        self.init(
-            value: Binding(get: { Double(value.wrappedValue) }, set: { value.wrappedValue = Int($0) }),
-            in: Double(bounds.lowerBound)...Double(bounds.upperBound),
-            step: Double(step),
-            label: label
-        )
+struct ValueSlider: View {
+    var name: String
+    @Binding
+    var value: Double
+    var range: ClosedRange<Double>
+    var step: Double
+    var decimalPoints = 1
+    var unit: String = ""
+
+    var body: some View {
+        Slider(value: $value, in: range, step: step) {
+            Text("\(name): \(value, specifier: "%.\(decimalPoints)f")\(unit)")
+                .lineLimit(1)
+        }
+    }
+}
+
+struct Vec3Sliders: View {
+    var name: String
+    @Binding
+    var vector: Vec3
+    var range: ClosedRange<Double>
+    var step: Double
+
+    var body: some View {
+        Text("\(name):")
+
+        Slider(value: $vector.x, in: range, step: step) {
+            Text("x: \(vector.x, specifier: "%.1f")")
+        }
+        Slider(value: $vector.y, in: range, step: step) {
+            Text("y: \(vector.y, specifier: "%.1f")")
+        }
+        Slider(value: $vector.z, in: range, step: step) {
+            Text("z: \(vector.z, specifier: "%.1f")")
+        }
     }
 }

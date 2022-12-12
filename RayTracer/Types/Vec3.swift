@@ -202,6 +202,13 @@ extension Vec3 {
         let random = randomInUnitSphere()
         return random • normal > 0 ? random : -random
     }
+
+    public static func randomInUnitDisk() -> Vec3 {
+        while true {
+            let vec = Vec3(.random(in: -1...1), .random(in: -1...1), 0)
+            if vec.lengthSquared < 1 { return vec }
+        }
+    }
 }
 
 // MARK: - Color Conversion
