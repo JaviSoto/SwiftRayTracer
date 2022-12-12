@@ -106,9 +106,21 @@ struct ContentView: View {
 
     var body: some View {
         HStack {
-            renderer.renderedImage
-                .resizable()
-                .aspectRatio(RayTracer.Scene.aspectRatio, contentMode: .fit)
+            ZStack {
+                if let renderedImage = renderer.renderedImage {
+                    renderedImage
+                        .resizable()
+                        .aspectRatio(RayTracer.Scene.aspectRatio, contentMode: .fit)
+                } else {
+                    Spacer()
+                        .frame(maxWidth: .infinity)
+                }
+
+                if renderer.rendering {
+                    ProgressView()
+                        .progressViewStyle(.circular)
+                }
+            }
 
             ZStack {
                 #if DEBUG
@@ -131,15 +143,26 @@ struct ContentView: View {
 @MainActor
 final class Renderer: ObservableObject {
     @Published
-    var renderedImage: SwiftUI.Image = SwiftUI.Image(systemName: "arrow.triangle.2.circlepath.circle.fill")
+    var renderedImage: SwiftUI.Image?
 
-    private var lastTask: DispatchWorkItem?
+    @Published
+    private(set) var rendering: Bool = false
+
+    private var lastTask: DispatchWorkItem? {
+        didSet {
+            oldValue?.cancel()
+        }
+    }
 
     func render(_ scene: RayTracer.Scene) {
         var task: DispatchWorkItem!
         task = DispatchWorkItem {
+            // Delay to collaesce scene changes
             guard !task.isCancelled else { return }
 
+            DispatchQueue.main.async {
+                self.rendering = true
+            }
             let image = measure("\(scene.width)x\(scene.height) (\(scene.samplesPerPixel) samples per pixel, \(scene.maxBounces) max bounces) scene") {
                 return scene
                     .render()
@@ -149,13 +172,14 @@ final class Renderer: ObservableObject {
             DispatchQueue.main.async {
                 guard !task.isCancelled else { return }
 
+                self.rendering = false
                 self.renderedImage = image
             }
         }
 
         lastTask = task
 
-        DispatchQueue.global(qos: .userInitiated).async(execute: task)
+        DispatchQueue.global(qos: .userInitiated).asyncAfter(deadline: .now() + .milliseconds(300), execute: task)
     }
 }
 
