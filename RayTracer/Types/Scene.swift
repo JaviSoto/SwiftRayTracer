@@ -6,23 +6,24 @@
 //
 
 import Foundation
-import RayTracer
 
-struct Scene: Equatable {
-    static let aspectRatio: Double = 16/9
+public struct Scene: Equatable {
+    public init() {}
 
-    var width: Int = 300
-    var height: Int {
+    public static let aspectRatio: Double = 16/9
+
+    public var width: Int = 300
+    public var height: Int {
         Int(Double(width) / Self.aspectRatio)
     }
 
-    var samplesPerPixel = 20
+    public var samplesPerPixel = 20
 
-    var maxBounces = 20
+    public var maxBounces = 20
 
-    var camera: Camera = .init(viewportWidth: 2 * Self.aspectRatio, viewportHeight: 2)
+    public var camera: Camera = .init(viewportWidth: 2 * Self.aspectRatio, viewportHeight: 2)
 
-    var world: World = .init(objects: [
+    public var world: World = .init(objects: [
         Sphere(center: .init(x: 0, y: 0, z: -1), radius: 0.5),
         Sphere(center: .init(x: 0, y: -100.5, z: -1), radius: 100),
     ])
@@ -40,7 +41,7 @@ struct Scene: Equatable {
         return .init(1.0 - t) * Color3(1) + .init(t) * Color3(0.5, 0.7, 1.0)
     }
 
-    func render() -> RayTracer.Image {
+    public func render() -> RayTracer.Image {
         assert(width > 0)
         assert(height > 0)
 

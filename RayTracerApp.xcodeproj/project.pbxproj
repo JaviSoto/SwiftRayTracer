@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		59220F0F294707BC00036C09 /* Scene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59BC0FF02946CDBA0091D064 /* Scene.swift */; };
 		5955D30B29468DD700B4C5EF /* Ray.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5955D30A29468DD700B4C5EF /* Ray.swift */; };
 		5955D30D294690FB00B4C5EF /* Image.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5955D30C294690FB00B4C5EF /* Image.swift */; };
 		5955D30F294692EF00B4C5EF /* Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5955D30E294692EF00B4C5EF /* Helpers.swift */; };
@@ -25,7 +26,6 @@
 		59BC0FEB2946AA000091D064 /* World.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59BC0FEA2946AA000091D064 /* World.swift */; };
 		59BC0FED2946C0210091D064 /* Camera.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59BC0FEC2946C0210091D064 /* Camera.swift */; };
 		59BC0FEF2946C3180091D064 /* SwiftUIExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59BC0FEE2946C3180091D064 /* SwiftUIExtensions.swift */; };
-		59BC0FF12946CDBA0091D064 /* Scene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59BC0FF02946CDBA0091D064 /* Scene.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -140,7 +140,6 @@
 			isa = PBXGroup;
 			children = (
 				597F395929466C4A00CF2C99 /* RayTracerAppApp.swift */,
-				59BC0FF02946CDBA0091D064 /* Scene.swift */,
 				597F395B29466C4A00CF2C99 /* ContentView.swift */,
 				5955D30E294692EF00B4C5EF /* Helpers.swift */,
 				59BC0FEE2946C3180091D064 /* SwiftUIExtensions.swift */,
@@ -186,6 +185,7 @@
 				5955D3122946A39100B4C5EF /* Sphere.swift */,
 				59BC0FEA2946AA000091D064 /* World.swift */,
 				59BC0FEC2946C0210091D064 /* Camera.swift */,
+				59BC0FF02946CDBA0091D064 /* Scene.swift */,
 			);
 			path = Types;
 			sourceTree = "<group>";
@@ -336,7 +336,6 @@
 			files = (
 				597F395C29466C4A00CF2C99 /* ContentView.swift in Sources */,
 				59BC0FEF2946C3180091D064 /* SwiftUIExtensions.swift in Sources */,
-				59BC0FF12946CDBA0091D064 /* Scene.swift in Sources */,
 				5955D30F294692EF00B4C5EF /* Helpers.swift in Sources */,
 				597F395A29466C4A00CF2C99 /* RayTracerAppApp.swift in Sources */,
 			);
@@ -350,6 +349,7 @@
 				5955D3132946A39100B4C5EF /* Sphere.swift in Sources */,
 				59BC0FED2946C0210091D064 /* Camera.swift in Sources */,
 				5955D30B29468DD700B4C5EF /* Ray.swift in Sources */,
+				59220F0F294707BC00036C09 /* Scene.swift in Sources */,
 				5955D30D294690FB00B4C5EF /* Image.swift in Sources */,
 				5955D3112946A2AC00B4C5EF /* Hittable.swift in Sources */,
 				597F398B29466C6600CF2C99 /* Vec3.swift in Sources */,

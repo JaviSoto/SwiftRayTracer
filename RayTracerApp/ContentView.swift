@@ -9,7 +9,7 @@ import SwiftUI
 import RayTracer
 
 struct ContentView: View {
-    @State private var scene: Scene = Scene()
+    @State private var scene = RayTracer.Scene()
 
     @ObservedObject
     private var renderer = Renderer()
@@ -76,7 +76,7 @@ struct ContentView: View {
                                 .lineLimit(1)
                         }
                         .onChange(of: scene.camera.viewportHeight) { viewportHeight in
-                            scene.camera.viewportWidth = (Scene.aspectRatio) * viewportHeight
+                            scene.camera.viewportWidth = (RayTracer.Scene.aspectRatio) * viewportHeight
                         }
 
                         Slider(value: $scene.camera.focalLength, in: -5...5, step: 0.1) {
@@ -108,7 +108,7 @@ struct ContentView: View {
         HStack {
             renderer.renderedImage
                 .resizable()
-                .aspectRatio(Scene.aspectRatio, contentMode: .fit)
+                .aspectRatio(RayTracer.Scene.aspectRatio, contentMode: .fit)
 
             ZStack {
                 #if DEBUG
@@ -135,7 +135,7 @@ final class Renderer: ObservableObject {
 
     private var lastTask: DispatchWorkItem?
 
-    func render(_ scene: Scene) {
+    func render(_ scene: RayTracer.Scene) {
         var task: DispatchWorkItem!
         task = DispatchWorkItem {
             guard !task.isCancelled else { return }
