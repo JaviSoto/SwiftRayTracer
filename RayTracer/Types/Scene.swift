@@ -26,13 +26,13 @@ public struct Scene: Equatable {
 
     public var maxBounces = 20
 
-    public var camera: Camera = .init(aspectRatio: Self.aspectRatio)
+    public var camera: Camera = .init(aspectRatio: Self.aspectRatio, origin: .init(-2, 2, 1), target: .init(0, 0, -1))
 
     public var world: World = .init(objects: [
         Sphere(center: .init(0.0, -100.5, -1.0), radius: 100, material: groundMaterial),
         Sphere(center: .init(0.0, 0.0, -1.0), radius: 0.5, material: centerMaterial),
         Sphere(center: .init(-1.0, 0.0, -1.0), radius: 0.5, material: leftMaterial),
-        Sphere(center: .init(-1.0, 0.0, -1.0), radius: -0.4, material: leftMaterial),
+        Sphere(center: .init(-1.0, 0.0, -1.0), radius: -0.45, material: leftMaterial),
         Sphere(center: .init(1.0, 0.0, -1.0), radius: 0.5, material: rightMaterial)
     ])
 

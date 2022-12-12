@@ -17,16 +17,8 @@ struct ContentView: View {
     private var sphereConfigurationView: some View {
         ForEach(Array(scene.world.spheres.enumerated()), id: \.0) { index, sphere in
             VStack {
-                Text("Position:")
-                Slider(value: $scene.world.spheres[index].center.x, in: -100...100, step: 1) {
-                    Text("x: \(sphere.center.x, specifier: "%.1f")")
-                }
-                Slider(value: $scene.world.spheres[index].center.y, in: -100...100, step: 1) {
-                    Text("y: \(sphere.center.y, specifier: "%.1f")")
-                }
-                Slider(value: $scene.world.spheres[index].center.z, in: -100...100, step: 1) {
-                    Text("z: \(sphere.center.z, specifier: "%.1f")")
-                }
+                Vec3Sliders(name: "Position", vector: $scene.world.spheres[index].center, range: -100...100, step: 1)
+
                 VStack {
                     Slider(value: $scene.world.spheres[index].radius, in: 0...100, step: 0.5) {
                         Text("Radius: \(sphere.radius, specifier: "%.1f")")
@@ -34,8 +26,14 @@ struct ContentView: View {
                     }
                 }
 
-                Button("Remove") {
-                    scene.world.spheres.remove(at: index)
+                HStack {
+                    Button("Remove") {
+                        scene.world.spheres.remove(at: index)
+                    }
+
+                    Button("New Sphere") {
+                        scene.world.objects.append(Sphere(center: .init(0, 0, -1), radius: 0.3, material: Lambertian(albedo: Color3(1, 0, 0))))
+                    }
                 }
 
                 Spacer()
@@ -47,58 +45,67 @@ struct ContentView: View {
     }
 
     private var configurationView: some View {
-        Form {
-            HStack(alignment: .top) {
-                VStack {
-                    Text("Parameters")
-                        .font(.largeTitle)
+        VStack {
+            ScrollView {
+                Form {
+                    VStack {
+                        Text("Parameters")
+                            .font(.largeTitle)
 
-                    Section(header: Text("Render").fontWeight(.bold)) {
-                        Slider(value: $scene.width, in: 100...1024, step: 10) {
-                            Text("Width: \(scene.width)")
-                                .lineLimit(1)
+                        Section(header: Text("Render").fontWeight(.bold)) {
+                            Slider(value: $scene.width, in: 100...1024, step: 10) {
+                                Text("Width: \(scene.width)")
+                                    .lineLimit(1)
+                            }
+
+                            Slider(value: $scene.samplesPerPixel, in: 1...100, step: 1) {
+                                Text("Samples per pixel: \(scene.samplesPerPixel)")
+                                    .lineLimit(1)
+                            }
+
+                            Slider(value: $scene.maxBounces, in: 1...100, step: 1) {
+                                Text("Max bounces: \(scene.maxBounces)")
+                                    .lineLimit(1)
+                            }
                         }
 
-                        Slider(value: $scene.samplesPerPixel, in: 1...100, step: 1) {
-                            Text("Samples per pixel: \(scene.samplesPerPixel)")
-                                .lineLimit(1)
+                        Section(header: Text("Camera").fontWeight(.bold)) {
+                            Slider(value: $scene.camera.parameters.verticalFoV.degrees, in: 5...180, step: 10) {
+                                Text("Vertical FoV: \(scene.camera.parameters.verticalFoV.degrees, specifier: "%.0f")º")
+                                    .lineLimit(1)
+                            }
+
+                            Slider(value: $scene.camera.parameters.focalLength, in: -5...5, step: 0.1) {
+                                Text("Focal Length: \(scene.camera.parameters.focalLength, specifier: "%.1f")")
+                                    .lineLimit(1)
+                            }
+
+                            Vec3Sliders(name: "Origin", vector: $scene.camera.parameters.origin, range: -10...10, step: 1)
+                            Vec3Sliders(name: "Target", vector: $scene.camera.parameters.target, range: -10...10, step: 1)
+                            Vec3Sliders(name: "Up direction", vector: $scene.camera.parameters.upDirection, range: -1...1, step: 0.1)
                         }
 
-                        Slider(value: $scene.maxBounces, in: 1...100, step: 1) {
-                            Text("Max bounces: \(scene.maxBounces)")
-                                .lineLimit(1)
+                        Divider()
+
+                        Section(header: Text("Spheres:").fontWeight(.bold)) {
+                            TabView {
+                                sphereConfigurationView
+                            }
                         }
+
+                        Spacer()
                     }
-
-                    Section(header: Text("Camera").fontWeight(.bold)) {
-                        Slider(value: $scene.camera.verticalFoV.degrees, in: 5...180, step: 10) {
-                            Text("Vertical FoV: \(scene.camera.verticalFoV.degrees, specifier: "%.0f")º")
-                                .lineLimit(1)
-                        }
-
-                        Slider(value: $scene.camera.focalLength, in: -5...5, step: 0.1) {
-                            Text("Focal Length: \(scene.camera.focalLength, specifier: "%.1f")")
-                                .lineLimit(1)
-                        }
-                    }
-
-                    Divider()
-
-                    Section(header: Text("Spheres:").fontWeight(.bold)) {
-                        TabView {
-                            sphereConfigurationView
-                        }
-
-                        Button("New Sphere") {
-                            scene.world.objects.append(Sphere(center: .init(0, 0, -1), radius: 0.3, material: Lambertian(albedo: Color3(1, 0, 0))))
-                        }
-                    }
-
-                    Spacer()
+                    .font(.callout)
                 }
-                .font(.callout)
             }
+
+            Divider()
+            Button("Render") {
+                renderer.render(scene)
+            }
+            .disabled(renderer.rendering)
         }
+        .padding(.vertical)
     }
 
     var body: some View {
@@ -128,11 +135,27 @@ struct ContentView: View {
                     .frame(width: 200)
             }
         }
-        .onAppear {
-            renderer.render(scene)
+    }
+}
+
+private struct Vec3Sliders: View {
+    var name: String
+    @Binding
+    var vector: Vec3
+    var range: ClosedRange<Double>
+    var step: Double
+
+    var body: some View {
+        Text("\(name):")
+
+        Slider(value: $vector.x, in: range, step: step) {
+            Text("x: \(vector.x, specifier: "%.1f")")
         }
-        .onChange(of: scene) { scene in
-            renderer.render(scene)
+        Slider(value: $vector.y, in: range, step: step) {
+            Text("y: \(vector.y, specifier: "%.1f")")
+        }
+        Slider(value: $vector.z, in: range, step: step) {
+            Text("z: \(vector.z, specifier: "%.1f")")
         }
     }
 }
@@ -176,7 +199,7 @@ final class Renderer: ObservableObject {
 
         lastTask = task
 
-        DispatchQueue.global(qos: .userInitiated).asyncAfter(deadline: .now() + .milliseconds(300), execute: task)
+        DispatchQueue.global(qos: .userInitiated).asyncAfter(deadline: .now() + .milliseconds(100), execute: task)
     }
 }
 
