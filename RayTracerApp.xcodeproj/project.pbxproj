@@ -10,6 +10,8 @@
 		5955D30B29468DD700B4C5EF /* Ray.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5955D30A29468DD700B4C5EF /* Ray.swift */; };
 		5955D30D294690FB00B4C5EF /* Image.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5955D30C294690FB00B4C5EF /* Image.swift */; };
 		5955D30F294692EF00B4C5EF /* Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5955D30E294692EF00B4C5EF /* Helpers.swift */; };
+		5955D3112946A2AC00B4C5EF /* Hittable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5955D3102946A2AC00B4C5EF /* Hittable.swift */; };
+		5955D3132946A39100B4C5EF /* Sphere.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5955D3122946A39100B4C5EF /* Sphere.swift */; };
 		597F395A29466C4A00CF2C99 /* RayTracerAppApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 597F395929466C4A00CF2C99 /* RayTracerAppApp.swift */; };
 		597F395C29466C4A00CF2C99 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 597F395B29466C4A00CF2C99 /* ContentView.swift */; };
 		597F395E29466C4B00CF2C99 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 597F395D29466C4B00CF2C99 /* Assets.xcassets */; };
@@ -64,6 +66,8 @@
 		5955D30A29468DD700B4C5EF /* Ray.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Ray.swift; sourceTree = "<group>"; };
 		5955D30C294690FB00B4C5EF /* Image.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Image.swift; sourceTree = "<group>"; };
 		5955D30E294692EF00B4C5EF /* Helpers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Helpers.swift; sourceTree = "<group>"; };
+		5955D3102946A2AC00B4C5EF /* Hittable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Hittable.swift; sourceTree = "<group>"; };
+		5955D3122946A39100B4C5EF /* Sphere.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sphere.swift; sourceTree = "<group>"; };
 		597F395629466C4A00CF2C99 /* RayTracerApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RayTracerApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		597F395929466C4A00CF2C99 /* RayTracerAppApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RayTracerAppApp.swift; sourceTree = "<group>"; };
 		597F395B29466C4A00CF2C99 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -168,6 +172,8 @@
 				597F398A29466C6600CF2C99 /* Vec3.swift */,
 				5955D30A29468DD700B4C5EF /* Ray.swift */,
 				5955D30C294690FB00B4C5EF /* Image.swift */,
+				5955D3102946A2AC00B4C5EF /* Hittable.swift */,
+				5955D3122946A39100B4C5EF /* Sphere.swift */,
 			);
 			path = Types;
 			sourceTree = "<group>";
@@ -326,8 +332,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5955D3132946A39100B4C5EF /* Sphere.swift in Sources */,
 				5955D30B29468DD700B4C5EF /* Ray.swift in Sources */,
 				5955D30D294690FB00B4C5EF /* Image.swift in Sources */,
+				5955D3112946A2AC00B4C5EF /* Hittable.swift in Sources */,
 				597F398B29466C6600CF2C99 /* Vec3.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

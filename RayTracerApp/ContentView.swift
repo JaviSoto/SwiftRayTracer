@@ -30,27 +30,18 @@ private struct Scene {
         var viewportHeight: Double = 2
         var focalLength: Double = 1
 
-        var sphereRadius: Double = 0.5
         var sphereCenter: Point3 = .init(x: 0, y: 0, z: -1)
+        var sphereRadius: Double = 0.5
     }
 
     var parameters: Parameters = .init()
 
-    private func hitSphere(_ ray: Ray) -> Double? {
-        let oc = ray.origin - parameters.sphereCenter
-        let a = ray.direction • ray.direction
-        let b = 2 * (oc • ray.direction)
-        let c = (oc • oc) - (parameters.sphereRadius * parameters.sphereRadius)
-        let discriminant = b * b - (4 * a * c);
-        guard discriminant >= 0 else { return nil }
-
-        return (-b - discriminant.squareRoot()) / (2 * a)
-    }
-
     private func rayColor(_ ray: Ray) -> Color3 {
-        if let sphereHit = hitSphere(ray) {
-            if sphereHit > 0 {
-                let n: Vec3 = (ray.point(at: sphereHit) - Vec3(0, 0, -1)).normalized()
+        let sphere = Sphere(center: parameters.sphereCenter, radius: parameters.sphereRadius)
+
+        if let sphereHit = sphere.hitTest(with: ray, validTRange: 0.0...(.greatestFiniteMagnitude)) {
+            if sphereHit.t > 0 {
+                let n: Vec3 = (sphereHit.point - Vec3(0, 0, -1)).normalized()
                 return 0.5 * Color3(n.x + 1, n.y + 1, n.z + 1)
             }
         }
@@ -99,45 +90,40 @@ struct ContentView: View {
                     Text("Parameters")
                         .font(.largeTitle)
 
+                    Section(header: Text("Viewport").fontWeight(.bold)) {
+                        Slider(value: $scene.parameters.viewportHeight, in: -5...5, step: 0.1) {
+                            Text("Height: \(scene.parameters.viewportHeight, specifier: "%.1f")")
+                                .lineLimit(1)
+                        }
+
+                        Slider(value: $scene.parameters.focalLength, in: -5...5, step: 0.1) {
+                            Text("Focal Length: \(scene.parameters.focalLength, specifier: "%.1f")")
+                                .lineLimit(1)
+                        }
+                    }
+
                     Divider()
 
-                    VStack {
-                        Text("Viewport Height: \(scene.parameters.viewportHeight, specifier: "%.1f")")
-                            .lineLimit(1)
-                        Slider(value: $scene.parameters.viewportHeight, in: -5...5, step: 0.1)
-                    }
-
-                    VStack {
-                        Text("Focal Length: \(scene.parameters.focalLength, specifier: "%.1f")")
-                            .lineLimit(1)
-                        Slider(value: $scene.parameters.focalLength, in: -5...5, step: 0.1)
-                    }
-
-                    Divider()
-
-                    Text("Sphere:")
-                        .fontWeight(.bold)
-
-                    VStack {
-                        Text("Radius: \(scene.parameters.sphereRadius, specifier: "%.1f")")
-                            .lineLimit(1)
-                        Slider(value: $scene.parameters.sphereRadius, in: 0...10, step: 0.1)
-                    }
-
-                    VStack {
-                        Text("Position: (\(scene.parameters.sphereCenter.x, specifier: "%.1f"), \(scene.parameters.sphereCenter.y, specifier: "%.1f"), \(scene.parameters.sphereCenter.z, specifier: "%.1f"))")
-                            .lineLimit(1)
-                        HStack {
-                            Text("x: ")
-                            Slider(value: $scene.parameters.sphereCenter.x, in: -10...10, step: 0.1)
+                    Section(header: Text("Sphere:").fontWeight(.bold)) {
+                        VStack {
+                            Text("Position: (\(scene.parameters.sphereCenter.x, specifier: "%.1f"), \(scene.parameters.sphereCenter.y, specifier: "%.1f"), \(scene.parameters.sphereCenter.z, specifier: "%.1f"))")
+                                .lineLimit(1)
+                            Slider(value: $scene.parameters.sphereCenter.x, in: -10...10, step: 0.1) {
+                                Text("x: ")
+                            }
+                            Slider(value: $scene.parameters.sphereCenter.y, in: -10...10, step: 0.1) {
+                                Text("y: ")
+                            }
+                            Slider(value: $scene.parameters.sphereCenter.z, in: -10...10, step: 0.1) {
+                                Text("z: ")
+                            }
                         }
-                        HStack {
-                            Text("y: ")
-                            Slider(value: $scene.parameters.sphereCenter.y, in: -10...10, step: 0.1)
-                        }
-                        HStack {
-                            Text("z: ")
-                            Slider(value: $scene.parameters.sphereCenter.z, in: -10...10, step: 0.1)
+
+                        VStack {
+                            Slider(value: $scene.parameters.sphereRadius, in: 0...10, step: 0.1) {
+                                Text("Radius: \(scene.parameters.sphereRadius, specifier: "%.1f")")
+                                    .lineLimit(1)
+                            }
                         }
                     }
 
