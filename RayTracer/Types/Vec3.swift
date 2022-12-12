@@ -47,11 +47,11 @@ extension Vec3 {
     }
 
     public mutating func normalize() {
-        self = normalized()
+        self = normalized
     }
 
     // unit_vector()
-    public func normalized() -> Vec3 {
+    public var normalized: Vec3 {
         return self / .init(self.length)
     }
 
@@ -157,6 +157,13 @@ extension Vec3 {
     public func reflect(_ v: Vec3) -> Vec3 {
         return self - 2 * Vec3(self • v) * v
     }
+
+    public func refract(_ v: Vec3, etaiOverEtat: Double) -> Vec3 {
+        let cosTheta = fmin((-self • v), 1.0)
+        let rOutPerp = Vec3(etaiOverEtat) * (self + Vec3(cosTheta) * v)
+        let rOutParallel = Vec3(-sqrt(fabs(1.0 - rOutPerp.lengthSquared))) * v
+        return rOutPerp + rOutParallel
+    }
 }
 
 // MARK: - ExpressibleBy
@@ -188,7 +195,7 @@ extension Vec3 {
     }
 
     public static func randomUnitVector() -> Vec3 {
-        return .randomInUnitSphere().normalized()
+        return .randomInUnitSphere().normalized
     }
 
     public static func randomInHemisphere(normal: Vec3) -> Vec3 {

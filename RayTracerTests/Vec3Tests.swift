@@ -31,7 +31,7 @@ final class Vec3Tests: XCTestCase {
     }
 
     func testNormalized() {
-        XCTAssertEqual(Vec3(1, 2, 2).normalized(), .init(1/3, 2/3, 2/3))
+        XCTAssertEqual(Vec3(1, 2, 2).normalized, .init(1/3, 2/3, 2/3))
     }
 
     func testMinus() {

@@ -7,15 +7,10 @@
 
 import Foundation
 
-extension Lambertian {
-    static let groundMaterial = Lambertian(albedo: Color3(0.8, 0.8, 0))
-    static let centerMaterial = Lambertian(albedo: Color3(0.7, 0.3, 0.3))
-}
-
-extension Metal {
-    static let leftMaterial = Metal(albedo: Color3(0.8, 0.8, 0.8), fuzz: 0.3)
-    static let rightMaterial = Metal(albedo: Color3(0.8, 0.6, 0.2), fuzz: 1)
-}
+private let groundMaterial = Lambertian(albedo: Color3(0.8, 0.8, 0))
+private let centerMaterial = Lambertian(albedo: Color3(0.1, 0.2, 0.5))
+private let leftMaterial = Dielectric(refractionIndex: 1.5)
+private let rightMaterial = Metal(albedo: Color3(0.8, 0.6, 0.2), fuzz: 0)
 
 public struct Scene: Equatable {
     public init() {}
@@ -34,10 +29,10 @@ public struct Scene: Equatable {
     public var camera: Camera = .init(viewportWidth: 2 * Self.aspectRatio, viewportHeight: 2)
 
     public var world: World = .init(objects: [
-        Sphere(center: .init(0.0, -100.5, -1.0), radius: 100, material: Lambertian.groundMaterial),
-        Sphere(center: .init(0.0, 0.0, -1.0), radius: 0.5, material: Lambertian.centerMaterial),
-        Sphere(center: .init(-1.0, 0.0, -1.0), radius: 0.5, material: Metal.leftMaterial),
-        Sphere(center: .init(1.0, 0.0, -1.0), radius: 0.5, material: Metal.rightMaterial)
+        Sphere(center: .init(0.0, -100.5, -1.0), radius: 100, material: groundMaterial),
+        Sphere(center: .init(0.0, 0.0, -1.0), radius: 0.5, material: centerMaterial),
+        Sphere(center: .init(-1.0, 0.0, -1.0), radius: 0.5, material: leftMaterial),
+        Sphere(center: .init(1.0, 0.0, -1.0), radius: 0.5, material: rightMaterial)
     ])
 
     private func rayColor(_ ray: Ray, bouncesLeft: Int) -> Color3 {
