@@ -25,6 +25,7 @@
 		59BC0FEB2946AA000091D064 /* World.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59BC0FEA2946AA000091D064 /* World.swift */; };
 		59BC0FED2946C0210091D064 /* Camera.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59BC0FEC2946C0210091D064 /* Camera.swift */; };
 		59BC0FEF2946C3180091D064 /* SwiftUIExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59BC0FEE2946C3180091D064 /* SwiftUIExtensions.swift */; };
+		59BC0FF12946CDBA0091D064 /* Scene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59BC0FF02946CDBA0091D064 /* Scene.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -85,6 +86,7 @@
 		59BC0FEA2946AA000091D064 /* World.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = World.swift; sourceTree = "<group>"; };
 		59BC0FEC2946C0210091D064 /* Camera.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Camera.swift; sourceTree = "<group>"; };
 		59BC0FEE2946C3180091D064 /* SwiftUIExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUIExtensions.swift; sourceTree = "<group>"; };
+		59BC0FF02946CDBA0091D064 /* Scene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Scene.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -138,6 +140,7 @@
 			isa = PBXGroup;
 			children = (
 				597F395929466C4A00CF2C99 /* RayTracerAppApp.swift */,
+				59BC0FF02946CDBA0091D064 /* Scene.swift */,
 				597F395B29466C4A00CF2C99 /* ContentView.swift */,
 				5955D30E294692EF00B4C5EF /* Helpers.swift */,
 				59BC0FEE2946C3180091D064 /* SwiftUIExtensions.swift */,
@@ -333,6 +336,7 @@
 			files = (
 				597F395C29466C4A00CF2C99 /* ContentView.swift in Sources */,
 				59BC0FEF2946C3180091D064 /* SwiftUIExtensions.swift in Sources */,
+				59BC0FF12946CDBA0091D064 /* Scene.swift in Sources */,
 				5955D30F294692EF00B4C5EF /* Helpers.swift in Sources */,
 				597F395A29466C4A00CF2C99 /* RayTracerAppApp.swift in Sources */,
 			);

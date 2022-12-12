@@ -9,7 +9,7 @@ import SwiftUI
 
 @main
 struct RayTracerAppApp: App {
-    var body: some Scene {
+    var body: some SwiftUI.Scene {
         WindowGroup {
             ContentView()
         }
