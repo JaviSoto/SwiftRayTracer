@@ -54,17 +54,17 @@ struct ContentView: View {
                         .font(.largeTitle)
 
                     Section(header: Text("Render").fontWeight(.bold)) {
-                        Slider(javivalue: $scene.width, in: 100...1024, step: 10) {
+                        Slider(value: $scene.width, in: 100...1024, step: 10) {
                             Text("Width: \(scene.width)")
                                 .lineLimit(1)
                         }
 
-                        Slider(javivalue: $scene.samplesPerPixel, in: 1...100, step: 1) {
+                        Slider(value: $scene.samplesPerPixel, in: 1...100, step: 1) {
                             Text("Samples per pixel: \(scene.samplesPerPixel)")
                                 .lineLimit(1)
                         }
 
-                        Slider(javivalue: $scene.maxBounces, in: 1...100, step: 1) {
+                        Slider(value: $scene.maxBounces, in: 1...100, step: 1) {
                             Text("Max bounces: \(scene.maxBounces)")
                                 .lineLimit(1)
                         }

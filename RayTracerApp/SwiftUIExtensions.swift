@@ -31,7 +31,7 @@ extension View {
 }
 
 extension Slider where ValueLabel == EmptyView {
-    init(javivalue value: Binding<Int>, in bounds: ClosedRange<Int>, step: Int, label: () -> Label) {
+    init(value: Binding<Int>, in bounds: ClosedRange<Int>, step: Int, label: () -> Label) {
         self.init(
             value: Binding(get: { Double(value.wrappedValue) }, set: { value.wrappedValue = Int($0) }),
             in: Double(bounds.lowerBound)...Double(bounds.upperBound),
