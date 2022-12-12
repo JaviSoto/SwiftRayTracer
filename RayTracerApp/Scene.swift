@@ -11,14 +11,14 @@ import RayTracer
 struct Scene: Equatable {
     static let aspectRatio: Double = 16/9
 
-    var width: Int = 512
+    var width: Int = 300
     var height: Int {
         Int(Double(width) / Self.aspectRatio)
     }
 
-    var samplesPerPixel = 1
+    var samplesPerPixel = 20
 
-    var maxBounces = 10
+    var maxBounces = 20
 
     var camera: Camera = .init(viewportWidth: 2 * Self.aspectRatio, viewportHeight: 2)
 
@@ -30,8 +30,8 @@ struct Scene: Equatable {
     private func rayColor(_ ray: Ray, bouncesLeft: Int) -> Color3 {
         guard bouncesLeft > 0 else { return Color3(0) }
 
-        if let worldHit = world.hitTest(with: ray, validTRange: 0.0...(.greatestFiniteMagnitude)) {
-            let target = worldHit.point + worldHit.normal + .randomInUnitSphere()
+        if let worldHit = world.hitTest(with: ray, validTRange: 0.001...(.greatestFiniteMagnitude)) {
+            let target = worldHit.point + .randomInHemisphere(normal: worldHit.normal)
             return 0.5 * rayColor(Ray(origin: worldHit.point, direction: target - worldHit.point), bouncesLeft: bouncesLeft - 1)
         }
 
@@ -56,7 +56,11 @@ struct Scene: Equatable {
                             pixelColor += rayColor(ray, bouncesLeft: maxBounces)
                         }
 
-                        pixelColor /= .init(Double(samplesPerPixel))
+                        // Divide the color by the number of samples and gamma-correct for gamma=2.0.
+                        let scale = 1 / Double(samplesPerPixel)
+                        pixelColor.red = (pixelColor.red * scale).squareRoot()
+                        pixelColor.green = (pixelColor.green * scale).squareRoot()
+                        pixelColor.blue = (pixelColor.blue * scale).squareRoot()
 
                         return pixelColor
                     }

@@ -67,10 +67,10 @@ extension Vec3: CustomStringConvertible {
 // MARK: - Operators
 
 // dot product
-infix operator •
+infix operator •: MultiplicationPrecedence
 
 // cross product
-infix operator ⨯
+infix operator ⨯: MultiplicationPrecedence
 
 extension Vec3 {
     public static func - (lhs: Vec3, rhs: Vec3) -> Vec3 {
@@ -169,6 +169,15 @@ extension Vec3 {
             if vec.lengthSquared < 1 { return vec }
         }
     }
+
+    public static func randomUnitVector() -> Vec3 {
+        return .randomInUnitSphere().normalized()
+    }
+
+    public static func randomInHemisphere(normal: Vec3) -> Vec3 {
+        let random = randomInUnitSphere()
+        return random • normal > 0 ? random : -random
+    }
 }
 
 // MARK: - Color Conversion
@@ -176,9 +185,18 @@ extension Vec3 {
 import SwiftUI
 
 extension Vec3 {
-    public var red: Double { x }
-    public var green: Double { y }
-    public var blue: Double { z }
+    public var red: Double {
+        get { x }
+        set { x = newValue }
+    }
+    public var green: Double {
+        get { y }
+        set { y = newValue }
+    }
+    public var blue: Double {
+        get { z }
+        set { z = newValue }
+    }
 
     public var asColor: Color {
         return Color(red: x, green: y, blue: z)
